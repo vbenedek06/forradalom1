@@ -1,3 +1,6 @@
+
+const tomb = [];
+
 /**
  * Létrehoz egy div HTML elemet a megadott CSS osztállyal.
  * @param {string} osztaly - A div elemhez rendelt CSS osztály neve.
@@ -223,8 +226,3 @@ urlap.addEventListener('submit', (esemeny) => {
 
 kont.appendChild(tabl);   // a táblázatos rész hozzáadása
 kont.appendChild(formD);  // az űrlapos rész hozzáadása
-
-
-
-
-

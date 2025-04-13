@@ -1,4 +1,4 @@
-const tomb = [];
+
 /**
  * Az Area osztály egy új div elemet hoz létre a fő konténeren belül.
  * Ha a fő konténer még nem létezik, akkor azt létrehozza és hozzáadja a dokumentumhoz.
@@ -10,6 +10,8 @@ class Area {
      * @type {HTMLDivElement}
      */
     #div;
+    #manager;
+
 
     /**
     * Getter a privát #elem mezőhöz, így más osztályok, például a leszármazottak is hozzáférhetnek.
@@ -20,8 +22,13 @@ class Area {
         return this.#div;
     }
 
+    get manager() {
+        return this.#manager;
+    }
+
     // Konstruktor: létrehoz egy új divet a megadott osztálynévvel, és hozzáadja a fő konténerhez.
-    constructor(className) {
+    constructor(className, manager) {
+        this.#manager = manager;
         // Meghívjuk a privát metódust, amely visszaadja (vagy létrehozza) a fő konténer divet.
         const container = this.#getDivContainer();
 
@@ -64,51 +71,84 @@ class Tablazat extends Area {
      * és hozzáadja a fejlécet ('thead'), egy fejléc sort ('tr') és három oszlopnevet ('th').
      * @param {string} styleClass - A div elem CSS osztályneve, amely a táblázatot körbeöleli.
      */
-    constructor(osztaly) {
-        // Meghívjuk az Area osztály konstruktorát, hogy a struktúra kiindulópontját létrehozzuk.
-        super(osztaly);
+    constructor(osztaly, manager) {
+        // Meghívjuk az ősosztály (Area) konstruktorát, hogy az alapvető inicializálás megtörténjen.
+        // Az 'osztaly' paraméter pl. egy CSS osztály lehet, amit a HTML elemre rakunk.
+        // A 'manager' pedig a RevolutionHandler példány, ami a forradalmak listáját kezeli.
+        super(osztaly, manager);
 
-        // Létrehozzuk a <table> elemet, amely magát a táblázatot reprezentálja.
-        const table = document.createElement('table');
+        // Meghívjuk a privát metódust, amely létrehozza a táblázat DOM struktúráját.
+        // Visszatér egy <tbody> vagy más HTML elem referenciájával, amibe majd a sorokat tesszük.
+        const tablaTest = this.#keszitTabla();
 
-        // A <table> elemet beillesztjük az Area példány div-jébe, amely az oldal DOM-jában már jelen van.
-        this.div.appendChild(table);
+        // Beállítunk egy callback függvényt a manager objektumon.
+        // Ez akkor hívódik meg, amikor új forradalom kerül hozzáadásra.
+        this.manager.setRevolutionAddedCallback((revolution) => {
 
-        // A táblázat fejléc részének (<thead>) létrehozása.
-        const fejlec = document.createElement('thead');
-        table.appendChild(fejlec); // hozzáadás a táblázathoz
+            // Létrehozunk egy új <tr> (táblázatsor) elemet a forradalom adatainak megjelenítésére.
+            const tablaSor = document.createElement('tr');
 
-        // Egy új sor létrehozása a fejlécben, amely majd az oszlopneveket fogja tartalmazni.
-        const fejlecSor = document.createElement('tr');
-        fejlec.appendChild(fejlecSor); // sor hozzáadása a <thead>-hez
+            // Létrehozunk egy <td> cellát a forradalom nevének.
+            const forradalomCell = document.createElement('td');
+            // Beállítjuk a cella szövegét a revolution objektum 'forradalom' mezőjére.
+            forradalomCell.textContent = revolution.forradalom;
+            // Hozzáadjuk ezt a cellát a táblázatsorhoz.
+            tablaSor.appendChild(forradalomCell);
 
-        // A fejléc oszlopneveit tömbként tároljuk, így dinamikusan generálhatók a <th> elemek.
-        const fejlecMezok = ['forradalom', 'évszám', 'sikeres'];
+            // Létrehozunk egy <td> cellát az évszámnak.
+            const evszamCell = document.createElement('td');
+            // Beállítjuk a cella szövegét a revolution objektum 'evszam' mezőjére.
+            evszamCell.textContent = revolution.evszam;
+            // Hozzáadjuk ezt a cellát is a táblázatsorhoz.
+            tablaSor.appendChild(evszamCell);
 
-        // Végigiterálunk a mezőkön, és létrehozzuk hozzájuk a megfelelő <th> (table header cell) elemeket.
-        for (const szoveg of fejlecMezok) {
-            const cella = document.createElement('th'); // új fejléc cella
-            cella.innerText = szoveg;                   // a cella tartalma (szöveg beállítása)
-            fejlecSor.appendChild(cella);               // a cella hozzáadása a sorhoz
+            // Létrehozunk egy <td> cellát, amely a sikerességet mutatja.
+            const sikeresCell = document.createElement('td');
+            // Ha a revolution.sikeres igaz (true), akkor 'igen'-t írunk ki, különben 'nem'-et.
+            sikeresCell.textContent = revolution.sikeres ? 'igen' : 'nem';
+            // Hozzáadjuk ezt a cellát is a sorhoz.
+            tablaSor.appendChild(sikeresCell);
+
+            // Végül a kész sort hozzáadjuk a táblázat test részéhez, így megjelenik a lapon.
+            tablaTest.appendChild(tablaSor);
+        });
+    }
+
+
+    /**
+ * Privát metódus: létrehozza a táblázatot, beleértve a fejlécet és a törzset
+ * @returns {HTMLTableSectionElement} A táblázat törzse
+ */
+    #keszitTabla() {
+        const table = document.createElement('table'); // Létrehozzuk a <table> elemet
+        this.div.appendChild(table); // A div-be ágyazzuk
+        const thead = document.createElement('thead'); // Fejléc létrehozása
+        table.appendChild(thead); // A táblázathoz hozzáadjuk
+        const theadRow = document.createElement('tr'); // Fejléc sor létrehozása
+        thead.appendChild(theadRow); // A fejléc sor hozzáadása a fejléchez
+        const theadCells = ['forradalom', 'évszám', 'sikeres']; // Fejléc oszlopnevek
+        for (const cellContent of theadCells) {
+            const thcell = document.createElement('th'); // Új fejléc cella létrehozása
+            thcell.innerText = cellContent;               // A cella szövege
+            theadRow.appendChild(thcell);                 // A cellát hozzáadjuk a sorhoz
         }
-
-        // A táblázat törzs részét is létrehozzuk (<tbody>), ahol a későbbi sorok elhelyezkednek.
-        const tbody = document.createElement('tbody');
-        table.appendChild(tbody); // hozzáadás a <table>-hez
-
-        // Visszatér a <tbody> elemmel.
-        return tbody;
-
-
-
+        const tbody = document.createElement('tbody'); // A táblázat törzse
+        table.appendChild(tbody); // Hozzáadjuk a táblázathoz
+        return tbody; // Visszaadjuk a táblázat törzsét
     }
 }
 
-// Az Űrlap osztály, mely szintén a Terület leszármazottja, és létrehoz egy <form> elemet az adatok beviteléhez.
+
+
+
+/**
+ * A Form osztály az Area osztályt örökli, és egy HTML űrlapot hoz létre.
+ * A formon keresztül adatokat lehet megadni, amelyeket a menedzser kezeli.
+ */
 class Urlap extends Area {
-    constructor(osztaly,mezoLista) {
+    constructor(osztaly, mezoLista, manager) {
         // Meghívjuk a Terület konstruktorát.
-        super(osztaly);
+        super(osztaly, manager);
 
         // Létrehozunk egy <form> elemet.
         const formElem = document.createElement('form');
@@ -169,7 +209,7 @@ class Urlap extends Area {
                 // Létrehozunk egy második <option> elemet a 'nem' választáshoz.
                 const opcioNem = document.createElement('option');
 
-                // Érték: 'no', ez lesz a programozási szempontból érdekes érték.
+                // Érték: 'no'
                 opcioNem.value = 'no';
 
                 // A felhasználó által látott szöveg: 'nem'.
@@ -196,16 +236,55 @@ class Urlap extends Area {
         }
 
 
-        // Létrehozunk egy új <button> elemet a DOM-ban.
-        // Ez a gomb lesz felelős például az adatok elküldéséért vagy egy új sor hozzáadásáért a táblázathoz.
+        // Létrehozunk egy új <button> elemet, amely az űrlap elküldésére fog szolgálni.
         const gomb = document.createElement('button');
 
-        // Beállítjuk a gomb feliratát, ami a gombon megjelenő szöveg lesz.
-        // Jelen esetben: 'hozzáadás', azaz a felhasználó számára jelzi, hogy ezzel lehet adatot hozzáadni.
+        // A gomb típusát "submit"-re állítjuk, így amikor rákattintunk, az űrlap elküldésének eseményét váltja ki.
+        gomb.type = 'submit';
+
+        // A gomb szövegét beállítjuk, ami a felhasználó számára jelenik meg a gombon.
         gomb.textContent = 'hozzáadás';
 
-        // A létrehozott gombot hozzáadjuk az előzőleg létrehozott <form> elemhez.
-        // Így a gomb megjelenik az űrlapon a felhasználó számára.
+        // A létrehozott gombot hozzáadjuk az űrlaphoz (formElem).
         formElem.appendChild(gomb);
+
+        // Hozzáadunk egy eseményfigyelőt az űrlaphoz, amely akkor aktiválódik, amikor az űrlapot elküldik (submit esemény).
+        formElem.addEventListener('submit', (e) => {
+
+            // Megakadályozzuk az űrlap alapértelmezett működését (pl. az oldal újratöltését).
+            e.preventDefault();
+
+            // Létrehozunk egy üres objektumot, amibe az input mezők értékeit gyűjtjük be.
+            const urlapAdatokObjektum = {};
+
+            // Lekérjük az összes input mezőt, ami az adott űrlapon (e.target) belül található.
+            const inputMezok = e.target.querySelectorAll('input');
+
+            // Végigmegyünk minden input mezőn
+            for (const inputMezo of inputMezok) {
+                // Az adott input mező ID-ját használjuk kulcsként, és az értékét mentjük el az objektumba.
+                urlapAdatokObjektum[inputMezo.id] = inputMezo.value;
+            }
+
+            // Lekérjük a "sikeres" mezőt, amely egy checkbox (vagy select), és külön ellenőrizzük.
+            const sikeresSelect = e.target.querySelector('#successful');
+
+            // A "sikeres" mező értékét logikai típussá alakítjuk: true, ha "yes", különben false.
+            urlapAdatokObjektum.sikeres = sikeresSelect.value === 'yes';
+
+            // Létrehozunk egy új Revolution objektumot az űrlap mezőiből nyert adatokkal.
+            const revolution = new Revolution(
+                urlapAdatokObjektum.revolution,  // forradalom neve
+                urlapAdatokObjektum.year,        // évszám
+                urlapAdatokObjektum.sikeres      // sikeresség logikai értékként
+            );
+
+            // A létrehozott forradalom objektumot hozzáadjuk a manager-hez (pl. táblázathoz).
+            this.manager.addRevolution(revolution);
+
+            // Az űrlapot alaphelyzetbe állítjuk, hogy tiszta mezők jelenjenek meg a felhasználónak.
+            formElem.reset();
+        });
+
     }
 }
