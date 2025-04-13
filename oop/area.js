@@ -94,3 +94,116 @@ class Tablazat extends Area {
 
     }
 }
+
+// Az Űrlap osztály, mely szintén a Terület leszármazottja, és létrehoz egy <form> elemet az adatok beviteléhez.
+class Urlap extends Area {
+    constructor(osztaly) {
+        // Meghívjuk a Terület konstruktorát.
+        super(osztaly);
+
+        // Létrehozunk egy <form> elemet.
+        const formElem = document.createElement('form');
+        // A form elemet beillesztjük a Terület által létrehozott div-be.
+        this.div.appendChild(formElem);
+
+        // Definiáljuk az űrlap mezőit tartalmazó tömböt.
+        const mezoLista = [
+            { fieldid: 'revolution', fieldLabel: 'forradalom' }, // Egy objektum amely a 'name' mezőhöz tartozó azonosítót és címkét tartalmazza
+            { fieldid: 'year', fieldLabel: 'evszam' }, // Egy objektum amely a 'birth'  mezőhöz tartozó azonosítót és címkét tartalmazza
+            { fieldid: 'successful', fieldLabel: 'sikeres' } // Egy objektum amely az 'zipcode' mezőhöz tartozó azonosítót és címkét tartalmazza
+        ];
+
+        // Végigiterálunk a mezoLista tömbön, amely objektumokat tartalmaz.
+// Minden objektum egy űrlapmezőt ír le (pl. forradalom, évszám, sikeresség).
+for (const mezo of mezoLista) {
+
+    // Létrehozunk egy <div> elemet, amely az aktuális űrlapmező (label + input/select) konténere lesz.
+    const mezoDiv = document.createElement('div');
+
+    // Hozzáadjuk a 'field' CSS osztályt a divhez, ami segíthet a mezők stílusának egységesítésében.
+    mezoDiv.classList.add('field');
+
+    // Az új divet hozzáadjuk az űrlaphoz (formElem), így az megjelenik a DOM-ban.
+    formElem.appendChild(mezoDiv);
+
+    // Létrehozunk egy <label> elemet, amely az adott mező feliratát tartalmazza.
+    const cimke = document.createElement('label');
+
+    // A label 'for' attribútumát beállítjuk, hogy megegyezzen az input mező ID-jával.
+    // Ezáltal ha a felhasználó rákattint a címkére, az a megfelelő input mezőre fókuszál.
+    cimke.htmlFor = mezo.fieldid;
+
+    // Beállítjuk a label látható szövegét az objektumból (pl. 'évszám', 'forradalom').
+    cimke.textContent = mezo.fieldLabel;
+
+    // A címkét hozzáadjuk az aktuális divhez, így az megjelenik a mező előtt.
+    mezoDiv.appendChild(cimke);
+
+    // Hozzáadunk egy sortörést, hogy a beviteli mező a címke alatt jelenjen meg.
+    mezoDiv.appendChild(document.createElement('br'));
+
+    // Ellenőrizzük, hogy az aktuális mező a 'sikeres' mező-e.
+    // Ehhez speciális mezőt (legördülő listát) hozunk létre, nem sima szöveges inputot.
+    if (mezo.fieldid === 'successful') {
+
+        // Létrehozunk egy <select> elemet, ami a legördülő menüt reprezentálja.
+        const legordulo = document.createElement('select');
+
+        // Beállítjuk a select ID-ját, hogy egyezzen a label 'for' attribútumával.
+        legordulo.id = mezo.fieldid;
+
+        // Létrehozunk egy <option> elemet az 'igen' választáshoz.
+        const opcioIgen = document.createElement('option');
+
+        // Az opció értéke (amit a program fog kapni) 'yes'.
+        opcioIgen.value = 'yes';
+
+        // A megjelenő szöveg az opcióban: 'igen'.
+        opcioIgen.textContent = 'igen';
+
+        // Hozzáadjuk az 'igen' opciót a select (legördülő) elemhez.
+        legordulo.appendChild(opcioIgen);
+
+        // Létrehozunk egy második <option> elemet a 'nem' választáshoz.
+        const opcioNem = document.createElement('option');
+
+        // Érték: 'no', ez lesz a programozási szempontból érdekes érték.
+        opcioNem.value = 'no';
+
+        // A felhasználó által látott szöveg: 'nem'.
+        opcioNem.textContent = 'nem';
+
+        // Hozzáadjuk a 'nem' opciót a legördülőhöz.
+        legordulo.appendChild(opcioNem);
+
+        // Végül hozzáadjuk a teljes legördülő mezőt a divhez.
+        mezoDiv.appendChild(legordulo);
+
+    } else {
+        // Ha a mező nem 'sikeres', tehát sima szöveg vagy szám mező, akkor input mezőt készítünk.
+
+        // Létrehozunk egy <input> elemet.
+        const inputElem = document.createElement('input');
+
+        // Beállítjuk az input mező ID-ját, hogy kapcsolódjon a label-hez.
+        inputElem.id = mezo.fieldid;
+
+        // Az input mezőt is hozzáadjuk a divhez, így megjelenik az oldalon.
+        mezoDiv.appendChild(inputElem);
+    }
+}
+
+
+        // Létrehozunk egy új <button> elemet a DOM-ban.
+        // Ez a gomb lesz felelős például az adatok elküldéséért vagy egy új sor hozzáadásáért a táblázathoz.
+        const gomb = document.createElement('button');
+
+        // Beállítjuk a gomb feliratát, ami a gombon megjelenő szöveg lesz.
+        // Jelen esetben: 'hozzáadás', azaz a felhasználó számára jelzi, hogy ezzel lehet adatot hozzáadni.
+        gomb.textContent = 'hozzáadás';
+
+        // A létrehozott gombot hozzáadjuk az előzőleg létrehozott <form> elemhez.
+        // Így a gomb megjelenik az űrlapon a felhasználó számára.
+        formElem.appendChild(gomb);
+    }
+}

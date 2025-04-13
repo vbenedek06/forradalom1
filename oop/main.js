@@ -11,4 +11,4 @@ const table = new Tablazat('table');
 
 // Létrehozunk egy új 'form' osztályú div elemet az Area osztály segítségével.
 // Ez az OOP alapú struktúrához tartozó űrlap szekció megjelenítésére szolgál.
-const forms = new Area('form');
+const forms = new Urlap('form');
