@@ -28,13 +28,47 @@ document.body.appendChild(kont);
 // A 'table' osztálynév azt jelöli, hogy ide kerül a táblázat vagy listázott adatok.
 const tabl = letrehozDiv('table');
 
-// Létrehozunk egy elemet az űrlap (adatbevitel) megjelenítéséhez.
-// A 'form' osztálynév alapján itt fognak elhelyezkedni a beviteli mezők és kapcsolódó elemek.
-const form = letrehozDiv('form');
+// Létrehozzuk magát a <table> HTML elemet, amely a táblázat struktúráját adja
+const tablaElem = document.createElement('table');
 
+// A <table> elemet beágyazzuk a táblázat divbe
+tabl.appendChild(tablaElem);
+
+// Létrehozzuk a táblázat fejléceit tartalmazó <thead> részt
+const fejlec = document.createElement('thead');
+
+// A <thead> elemet hozzáadjuk a táblázathoz
+tablaElem.appendChild(fejlec);
+
+// Létrehozunk egy sort (<tr>) a fejlécen belül
+const fejlecSor = document.createElement('tr');
+
+// A sort hozzáadjuk a fejléc (<thead>) elemhez
+fejlec.appendChild(fejlecSor);
+
+// A fejléc cellák tartalmát tömbben definiáljuk
+const fejlecMezok = ['forradalom', 'évszám', 'sikeres'];
+
+// Végigmegyünk a mezőkön, és létrehozzuk a <th> cellákat a sorban
+for (const szoveg of fejlecMezok) {
+    // Egy új <th> cella létrehozása
+    const cella = document.createElement('th');
+    
+    // A cella szövegének beállítása
+    cella.innerText = szoveg;
+    
+    // A cellát hozzáadjuk a fejléc sorához
+    fejlecSor.appendChild(cella);
+}
+
+// Létrehozzuk a <tbody> részt, ahol a dinamikusan hozzáadott adatok fognak megjelenni
+const tablaTest = document.createElement('tbody');
+
+// A <tbody> elemet hozzáadjuk a táblázathoz
+tablaElem.appendChild(tablaTest);
 // A 'kont.appendChild' metódussal a táblázatot tartalmazó elemet (tabl) hozzáadjuk a fő konténerhez,
 // így a táblázat szekció az oldal fő részévé válik.
-kont.appendChild(tabl);
+kont.appendChild(tablaElem);
 
 // Szintén a fő konténerhez hozzáadjuk az űrlapot tartalmazó elemet (form),
 // így a felület részeként az űrlap is megjelenik a felhasználó számára.
