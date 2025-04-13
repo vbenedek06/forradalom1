@@ -18,7 +18,7 @@ const letrehozDiv = (osztaly) => {
 
 // Létrehozzuk a fő konténerelemet, amely minden további elemet tárol majd.
 // A 'container' osztálynév itt azt jelzi, hogy ez az elem az oldal fő tartója.
-const kont = letrehozDiv('container');
+const kont = letrehozDiv('container-sima');
 
 // A 'document.body.appendChild' metódussal a létrehozott konténer elemet hozzáadjuk a dokumentum <body> részéhez,
 // így a böngészőben megjelenik a kialakított fő tartó.

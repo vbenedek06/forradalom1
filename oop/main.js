@@ -7,7 +7,7 @@ document.body.appendChild(elvalaszto);
 
 // Létrehozunk egy új 'table' osztályú div elemet az Area osztály segítségével.
 // Ez az OOP alapú struktúrához tartozó táblázat szekció megjelenítésére szolgál.
-const table = new Area('table');
+const table = new Tablazat('table');
 
 // Létrehozunk egy új 'form' osztályú div elemet az Area osztály segítségével.
 // Ez az OOP alapú struktúrához tartozó űrlap szekció megjelenítésére szolgál.
