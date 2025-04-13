@@ -5,10 +5,19 @@ const elvalaszto = document.createElement('hr');
 // A létrehozott elválasztó vonalat hozzáadjuk a dokumentum <body> részéhez, így az megjelenik az oldalon.
 document.body.appendChild(elvalaszto);
 
-// Létrehozunk egy új 'table' osztályú div elemet az Area osztály segítségével.
-// Ez az OOP alapú struktúrához tartozó táblázat szekció megjelenítésére szolgál.
+// Létrehozunk egy tömböt, amely az űrlap mezőinek beállításait tartalmazza, mint az ID-k és a címkék.
+// Minden objektum tartalmazza az adott mező egyedi azonosítóját ('fieldid') és annak címkéjét ('fieldLabel').
+const mezoBeall = [
+    { fieldid: 'revolution', fieldLabel: 'forradalom' }, // Egy objektum amely a 'name' mezőhöz tartozó azonosítót és címkét tartalmazza
+    { fieldid: 'year', fieldLabel: 'evszam' }, // Egy objektum amely a 'birth'  mezőhöz tartozó azonosítót és címkét tartalmazza
+    { fieldid: 'successful', fieldLabel: 'sikeres' } // Egy objektum amely az 'zipcode' mezőhöz tartozó azonosítót és címkét tartalmazza
+    
+]
+// Létrehozunk egy új példányt a 'Tablazat' osztályból, amely egy táblázatot reprezentál.
+// A 'table' osztályú div elemet hozunk létre, amely az OOP alapú struktúrához tartozik,
 const table = new Tablazat('table');
 
-// Létrehozunk egy új 'form' osztályú div elemet az Area osztály segítségével.
-// Ez az OOP alapú struktúrához tartozó űrlap szekció megjelenítésére szolgál.
-const forms = new Urlap('form');
+// Létrehozunk egy új példányt az 'Urlap' osztályból, amely egy űrlapot reprezentál.
+// Az 'form' osztályú div elemet hozunk létre, amely az OOP alapú struktúrához tartozik, és az űrlapok kezelésére szolgál.
+// Az űrlap mezőinek beállításait (fieldid és fieldLabel) a mezoBeall tömb tartalmazza.
+const forms = new Urlap('form', mezoBeall);
