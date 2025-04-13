@@ -1,3 +1,4 @@
+const tomb = [];
 /**
  * Az Area osztály egy új div elemet hoz létre a fő konténeren belül.
  * Ha a fő konténer még nem létezik, akkor azt létrehozza és hozzáadja a dokumentumhoz.

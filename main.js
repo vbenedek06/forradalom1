@@ -159,6 +159,67 @@ const gomb = document.createElement('button');
 gomb.textContent = 'hozzáadás';
 // Hozzáadjuk a gombot a <form> elemhez
 urlap.appendChild(gomb);
+// Hozzáadunk egy eseményfigyelőt a <form> elemhez, amely akkor fut le, amikor a felhasználó beküldi az űrlapot.
+urlap.addEventListener('submit', (esemeny) => {
+
+    // Megakadályozzuk az űrlap alapértelmezett viselkedését (ne töltse újra az oldalt).
+    esemeny.preventDefault();
+
+    // Létrehozunk egy üres objektumot, amibe az űrlapmezők adatait fogjuk gyűjteni.
+    const urlapAdatokObjektum = {};
+
+    // Lekérjük az összes <input> mezőt, amely az eseményt kiváltó <form>-on belül található.
+    const inputMezok = esemeny.target.querySelectorAll('input');
+
+    // Végigmegyünk az összes <input> mezőn, és az ID-ját kulcsként, az értékét pedig értékként eltároljuk az objektumban.
+    for (const inputMezo of inputMezok) {
+        urlapAdatokObjektum[inputMezo.id] = inputMezo.value;
+    }
+
+    // Lekérjük az egyetlen <select> mezőt az űrlapon belül.
+    const selectElem = esemeny.target.querySelector('select');
+
+    // A legördülő mező értékét is hozzáadjuk az objektumhoz (pl. "yes" vagy "no").
+    urlapAdatokObjektum[selectElem.id] = selectElem.value;
+
+    // Az összegyűjtött adatokat (az objektumot) elmentjük egy globális tömbbe, hogy később is elérhető legyen.
+    tomb.push(urlapAdatokObjektum);
+
+    // Létrehozunk egy új táblázatsort (<tr>), amely majd a <tbody> részhez kerül.
+    const tablaTorzsSor = document.createElement('tr');
+
+    // Hozzáadjuk a létrehozott sort a táblázat törzséhez (tbody).
+    tablaTest.appendChild(tablaTorzsSor);
+
+    // Létrehozunk egy új <td> cellát a 'revolution' mező adatának (pl. 1848).
+    const forradalomCell = document.createElement('td');
+
+    // Beállítjuk a cella szövegét a beküldött adat alapján.
+    forradalomCell.textContent = urlapAdatokObjektum.revolution;
+
+    // Hozzáadjuk ezt a cellát a sorhoz.
+    tablaTorzsSor.appendChild(forradalomCell);
+
+    // Létrehozunk egy új <td> cellát az 'year' mező adatának.
+    const evszamCell = document.createElement('td');
+
+    // Beállítjuk a cella tartalmát a megfelelő évszám értékre.
+    evszamCell.textContent = urlapAdatokObjektum.year;
+
+    // Hozzáadjuk az évszám cellát a táblázatsorhoz.
+    tablaTorzsSor.appendChild(evszamCell);
+
+    // Létrehozunk egy új <td> cellát a 'successful' mező adatának (sikeres volt-e a forradalom).
+    const sikeresCell = document.createElement('td');
+
+    // A sikeresség értékét "igen" vagy "nem" formában jelenítjük meg a cellában a 'yes'/'no' érték alapján.
+    sikeresCell.textContent = urlapAdatokObjektum.successful === 'yes' ? 'igen' : 'nem';
+
+    // Hozzáadjuk a sikerességet tartalmazó cellát a sorhoz.
+    tablaTorzsSor.appendChild(sikeresCell);
+});
+
+
 
 kont.appendChild(tabl);   // a táblázatos rész hozzáadása
 kont.appendChild(formD);  // az űrlapos rész hozzáadása
