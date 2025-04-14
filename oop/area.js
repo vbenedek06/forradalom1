@@ -284,6 +284,79 @@ class Urlap extends Area {
     
 }
 
+/**
+ * Az `Feltoltes` osztály egy fájl feltöltésére szolgáló funkciót valósít meg.
+ * A fájl tartalmát feldolgozza, és a benne található adatokat `Revolution` objektumokká alakítja.
+ */
+class Feltoltes extends Area {
+    /**
+     * Konstruktor: Létrehozza a fájl feltöltésére szolgáló input mezőt, és beállítja az eseményfigyelőt.
+     * @param {string} stilusOsztaly - A div CSS osztályneve, amely a fájl feltöltését körülveszi.
+     * @param {RevolutionManager} kezelo - A manager objektum, amely a forradalmak listáját kezeli.
+     */
+    constructor(stilusOsztaly, kezelo) {
+        super(stilusOsztaly, kezelo); // Meghívjuk az Area szülőosztály konstruktorát.
+
+        // Létrehozunk egy fájl feltöltésére szolgáló input mezőt.
+        const fajlInput = document.createElement('input'); // Új <input> elem létrehozása.
+        fajlInput.id = 'fajlfeltoltes'; // Beállítjuk az input mező ID-ját.
+        fajlInput.type = 'file'; // Az input mező típusát fájl feltöltésre állítjuk.
+        this.div.appendChild(fajlInput); // Hozzáadjuk az input mezőt a div-hez.
+
+        // Hozzáadunk egy eseményfigyelőt az input mezőhöz, amely akkor aktiválódik, amikor a felhasználó fájlt választ.
+        fajlInput.addEventListener('change', (esemeny) => {
+            const fajl = esemeny.target.files[0]; // Lekérjük a kiválasztott fájlt.
+            if (!fajl) {
+                console.warn('Nem választottak ki fájlt!');
+                return;
+            }
+
+            const fajlOlvaso = new FileReader(); // Létrehozunk egy FileReader példányt a fájl olvasásához.
+
+            // Amikor a fájl betöltődött, végrehajtjuk a következő műveleteket.
+            fajlOlvaso.onload = () => {
+                const fajlSorok = fajlOlvaso.result.split('\n'); // A fájl tartalmát sorokra bontjuk.
+                const fejlecNelkul = fajlSorok.slice(1); // Az első sort (fejléc) eltávolítjuk.
+
+                // Végigiterálunk a fájl sorain, hogy feldolgozzuk az adatokat.
+                for (const sor of fejlecNelkul) {
+                    const vagottSor = sor.trim(); // Levágjuk a felesleges szóközöket a sor elejéről és végéről.
+                    if (!vagottSor) continue; // Ha a sor üres, kihagyjuk.
+
+                    const mezok = vagottSor.split(';'); // A sort mezőkre bontjuk pontosvessző mentén.
+                    if (mezok.length < 3) {
+                        console.warn('Hiányos adat:', sor);
+                        continue; // Ha a sor nem tartalmaz elegendő mezőt, kihagyjuk.
+                    }
+
+                    // Ellenőrizzük a sikeresség mezőt, és logikai értékké alakítjuk.
+                    const sikeres = mezok[2].trim().toLowerCase() === 'igen';
+
+                    try {
+                        // Létrehozunk egy új Revolution objektumot az aktuális sor adataival.
+                        const forradalom = new Revolution(
+                            mezok[0].trim(), // A forradalom neve.
+                            Number(mezok[1].trim()), // Az évszám.
+                            sikeres // A sikeresség logikai értékké alakítva.
+                        );
+
+                        // Hozzáadjuk a forradalom objektumot a manager-hez.
+                        this.manager.addRevolution(forradalom);
+                    } catch (error) {
+                        console.error('Hiba történt a Revolution objektum létrehozásakor:', error);
+                    }
+                }
+            };
+
+           
+
+            fajlOlvaso.readAsText(fajl); // Elindítjuk a fájl olvasását szövegként.
+        });
+    }
+}
+
+
+
 // A FormField osztály egy űrlapmezőt reprezentál, amely tartalmaz egy címkét (label), egy beviteli mezőt (input) és egy hibaüzenet megjelenítésére szolgáló elemet (span).
 class FormField {
     // Privát mezők deklarálása, amelyek csak az osztályon belül érhetők el.
