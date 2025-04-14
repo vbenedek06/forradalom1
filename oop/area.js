@@ -8,8 +8,16 @@ class Area {
      * Privát mező, amely a létrehozott div HTML elemet tárolja.
      * A # szintaxis a JavaScript privát mező deklarálását jelöli, amely kívülről nem érhető el közvetlenül.
      * @type {HTMLDivElement}
+     * @private
      */
     #div;
+
+
+    /**
+     * A manager objektum, amely az osztály működését irányítja.
+     * @type {RevolutionManager}
+     * @private
+     */
     #manager;
 
 
@@ -22,10 +30,19 @@ class Area {
         return this.#div;
     }
 
+    /**
+    * Getter a privát #manager mezőhöz.
+    * @returns {RevolutionManager} A példányhoz tartozó manager objektum.
+    */
     get manager() {
         return this.#manager;
     }
 
+    /**
+     * Konstruktor: létrehoz egy új divet a megadott osztálynévvel, és hozzáadja a fő konténerhez.
+     * @param {string} className - A div CSS osztályneve.
+     * @param {RevolutionManager} manager - A manager objektum, amely az osztály működését irányítja.
+     */
     // Konstruktor: létrehoz egy új divet a megadott osztálynévvel, és hozzáadja a fő konténerhez.
     constructor(className, manager) {
         this.#manager = manager;
@@ -42,7 +59,12 @@ class Area {
         container.appendChild(this.#div);
     }
 
-    // Privát metódus: megkeresi vagy létrehozza a fő konténert.
+    /**
+     * Privát metódus: megkeresi vagy létrehozza a fő konténert.
+     * @returns {HTMLDivElement} A fő konténer div HTML elem.
+     * @private
+     */
+
     #getDivContainer() {
         // Megkeresi a DOM-ban a 'containeroop' osztályú elemet.
         let containerDiv = document.querySelector('.container-oop');
@@ -72,9 +94,11 @@ class Tablazat extends Area {
      * @param {string} styleClass - A div elem CSS osztályneve, amely a táblázatot körbeöleli.
      */
     constructor(osztaly, manager) {
-        // Meghívjuk az ősosztály (Area) konstruktorát, hogy az alapvető inicializálás megtörténjen.
-        // Az 'osztaly' paraméter pl. egy CSS osztály lehet, amit a HTML elemre rakunk.
-        // A 'manager' pedig a RevolutionHandler példány, ami a forradalmak listáját kezeli.
+        /**
+          * Konstruktor: létrehozza a táblázatot és beállítja a manager callbackjét.
+          * @param {string} osztaly - A táblázatot körülvevő div CSS osztályneve.
+          * @param {RevolutionManager} manager - A manager objektum, amely a forradalmak listáját kezeli.
+          */
         super(osztaly, manager);
 
         // Meghívjuk a privát metódust, amely létrehozza a táblázat DOM struktúráját.
@@ -115,10 +139,11 @@ class Tablazat extends Area {
     }
 
 
-    /**
- * Privát metódus: létrehozza a táblázatot, beleértve a fejlécet és a törzset
- * @returns {HTMLTableSectionElement} A táblázat törzse
- */
+     /**
+     * Privát metódus: létrehozza a táblázatot, beleértve a fejlécet és a törzset.
+     * @returns {HTMLTableSectionElement} A táblázat törzse.
+     * @private
+     */
     #keszitTabla() {
         const table = document.createElement('table'); // Létrehozzuk a <table> elemet
         this.div.appendChild(table); // A div-be ágyazzuk
@@ -149,11 +174,17 @@ class Urlap extends Area {
 
     #formFieldArray;
 
+     /**
+     * Konstruktor: létrehozza az űrlapot és a mezőket a megadott mezőlista alapján.
+     * @param {string} osztaly - A div CSS osztályneve, amely az űrlapot körülveszi.
+     * @param {Array<{fieldid: string, fieldLabel: string}>} mezoLista - A mezők listája, amelyek az űrlap mezőit definiálják.
+     * @param {RevolutionManager} manager - A manager objektum, amely az űrlap adatait kezeli.
+     */
     constructor(osztaly, mezoLista, manager) {
         // Meghívjuk a Terület konstruktorát.
         super(osztaly, manager);
-       // Inicializáljuk a privát tömböt
-       this.#formFieldArray = [];
+        // Inicializáljuk a privát tömböt
+        this.#formFieldArray = [];
         // Létrehozunk egy <form> elemet.
         const formElem = document.createElement('form');
         // A form elemet beillesztjük a Terület által létrehozott div-be.
@@ -163,7 +194,7 @@ class Urlap extends Area {
         // Minden objektum egy űrlapmezőt ír le (pl. forradalom, évszám, sikeresség).
         for (const mezo of mezoLista) {
             if (mezo.fieldid === 'successful') { // Ellenőrizzük, hogy az aktuális mező ID-ja "successful"-e
-                
+
                 const label = document.createElement('label'); // Létrehozunk egy <label> elemet, amely a mező címkéjét tartalmazza
                 label.htmlFor = mezo.fieldid;// A label 'for' attribútumát az ID-hoz rendeljük, hogy összekapcsolja a select mezővel
                 label.textContent = mezo.fieldLabel; // Beállítjuk a label szövegét a mező címkéjére
@@ -202,7 +233,7 @@ class Urlap extends Area {
                 formElem.appendChild(formField.getDiv());// A FormField által generált div-et hozzáadjuk az űrlaphoz (formElem)
             }
         }
-           
+
 
 
         // Létrehozunk egy <button> elemet az űrlap elküldéséhez
@@ -218,66 +249,105 @@ class Urlap extends Area {
 
             // Megakadályozzuk az űrlap alapértelmezett működését (pl. az oldal újratöltését).
             e.preventDefault();
-
-            // Létrehozunk egy üres objektumot, amibe az input mezők értékeit gyűjtjük be.
-            const urlapAdatokObjektum = {};
+            const valueObject = {};// Létrehozunk egy üres objektumot, amibe az input mezők értékeit gyűjtjük be.
+            let valid = true; // Validációs állapotot jelző változó
 
             // Lekérjük az összes input mezőt, ami az adott űrlapon (e.target) belül található.
             const inputMezok = e.target.querySelectorAll('input');
 
             // Végigmegyünk minden input mezőn
-            for (const inputMezo of inputMezok) {
-                // Az adott input mező ID-ját használjuk kulcsként, és az értékét mentjük el az objektumba.
-                urlapAdatokObjektum[inputMezo.id] = inputMezo.value;
+             // Végigiterálunk a FormField példányokon
+             for (const formField of this.#formFieldArray) {
+                formField.error = ''; // Alapértelmezésben nincs hibaüzenet
+                if (formField.value === '') { // Ellenőrizzük, hogy a mező üres-e
+                    formField.error = 'Kötelező megadni'; // Hibaüzenet beállítása
+                    valid = false; // A validáció sikertelen
+                }
+                valueObject[formField.id] = formField.value; // Hozzáadjuk az értéket az objektumhoz
             }
 
-            // Lekérjük a "sikeres" mezőt, amely egy checkbox (vagy select), és külön ellenőrizzük.
-            const sikeresSelect = e.target.querySelector('#successful');
+            if (valid) { // Ha minden mező valid, folytatjuk az adatfeldolgozást
+                const revolution = new Revolution(
+                    valueObject.revolution, // Forradalom neve
+                    Number(valueObject.year), // Évszám
+                    valueObject.successful === 'yes' // Sikeresség logikai értékként
+                );
+                 // A létrehozott forradalom objektumot hozzáadjuk a manager-hez (pl. táblázathoz).
+                this.manager.addRevolution(revolution);
 
-            // A "sikeres" mező értékét logikai típussá alakítjuk: true, ha "yes", különben false.
-            urlapAdatokObjektum.sikeres = sikeresSelect.value === 'yes';
+                 // Az űrlapot alaphelyzetbe állítjuk, hogy tiszta mezők jelenjenek meg a felhasználónak.
+                formElem.reset();
+            }
 
-            // Létrehozunk egy új Revolution objektumot az űrlap mezőiből nyert adatokkal.
-            const revolution = new Revolution(
-                urlapAdatokObjektum.revolution,  // forradalom neve
-                urlapAdatokObjektum.year,        // évszám
-                urlapAdatokObjektum.sikeres      // sikeresség logikai értékként
-            );
-
-            // A létrehozott forradalom objektumot hozzáadjuk a manager-hez (pl. táblázathoz).
-            this.manager.addRevolution(revolution);
-
-            // Az űrlapot alaphelyzetbe állítjuk, hogy tiszta mezők jelenjenek meg a felhasználónak.
-            formElem.reset();
         });
-
     }
+    
 }
 
 // A FormField osztály egy űrlapmezőt reprezentál, amely tartalmaz egy címkét (label), egy beviteli mezőt (input) és egy hibaüzenet megjelenítésére szolgáló elemet (span).
 class FormField {
     // Privát mezők deklarálása, amelyek csak az osztályon belül érhetők el.
+     /**
+     * Az űrlapmező azonosítója, amely egyedi az adott mezőhöz.
+     * @type {string}
+     * @private
+     */
     #id; // Az űrlapmező azonosítója, amely egyedi az adott mezőhöz.
+
+    /**
+     * Az input HTML elem, amely a felhasználói adatbevitelre szolgál.
+     * @type {HTMLInputElement}
+     * @private
+     */
     #inputElement; // Az input HTML elem, amely a felhasználói adatbevitelre szolgál.
+
+    /**
+     * A label HTML elem, amely a mező címkéjét tartalmazza.
+     * @type {HTMLLabelElement}
+     * @private
+     */
     #labelElement; // A label HTML elem, amely a mező címkéjét tartalmazza.
+    /**
+     * A span HTML elem, amely a hibaüzenetek megjelenítésére szolgál.
+     * @type {HTMLSpanElement}
+     * @private
+     */
     #errorElement; // A span HTML elem, amely a hibaüzenetek megjelenítésére szolgál.
 
     // Getter metódus az ID-hoz, amely lehetővé teszi az azonosító lekérdezését kívülről.
+
+    /**
+     * Getter metódus az ID-hoz, amely lehetővé teszi az azonosító lekérdezését kívülről.
+     * @returns {string} Az űrlapmező azonosítója.
+     */
     get id() {
         return this.#id; // Visszaadja a privát #id mező értékét.
     }
 
     // Getter metódus az input mező értékéhez, amely lehetővé teszi a felhasználó által bevitt adat lekérdezését.
+    /**
+     * Getter metódus az input mező értékéhez, amely lehetővé teszi a felhasználó által bevitt adat lekérdezését.
+     * @returns {string} Az input mező aktuális értéke.
+     */
     get value() {
         return this.#inputElement.value; // Visszaadja az input mező aktuális értékét.
     }
 
     // Setter metódus a hibaüzenet beállításához, amely lehetővé teszi a hibaüzenet szövegének módosítását.
+      /**
+     * Setter metódus a hibaüzenet beállításához, amely lehetővé teszi a hibaüzenet szövegének módosítását.
+     * @param {string} value - A hibaüzenet szövege.
+     */
     set error(value) {
         this.#errorElement.textContent = value; // Beállítja a hibaüzenet szövegét a span elemben.
     }
 
     // Konstruktor: inicializálja az osztály példányát, és létrehozza a szükséges HTML elemeket.
+     /**
+     * Konstruktor: inicializálja az osztály példányát, és létrehozza a szükséges HTML elemeket.
+     * @param {string} id - Az űrlapmező egyedi azonosítója.
+     * @param {string} labelContent - A mező címkéjének szövege.
+     */
     constructor(id, labelContent) {
         this.#id = id; // Beállítja a mező azonosítóját a kapott ID alapján.
 
@@ -296,6 +366,10 @@ class FormField {
     }
 
     // Metódus, amely visszaad egy div-et, amely tartalmazza az összes HTML elemet (label, input, hibaüzenet).
+     /**
+     * Metódus, amely visszaad egy div-et, amely tartalmazza az összes HTML elemet (label, input, hibaüzenet).
+     * @returns {HTMLDivElement} A mezőt tartalmazó div elem.
+     */
     getDiv() {
         const div = document.createElement('div'); // Létrehoz egy új <div> elemet, amely a mező konténere lesz.
         div.classList.add('field'); // Hozzáadja a 'field' osztályt a div-hez, hogy stílusozható legyen.
