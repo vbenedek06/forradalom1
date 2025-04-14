@@ -343,3 +343,39 @@ fajlInput.addEventListener('change', (esemeny) => {
     // Elindítjuk a fájl olvasását szövegként
     fajlOlvaso.readAsText(fajl);
 });
+
+// Létrehozunk egy új gombot, amely az adatok exportálására szolgál.
+const exportGomb = document.createElement('button'); // Új <button> elem létrehozása.
+exportGomb.textContent = 'Adatok letöltése'; // Beállítjuk a gomb szövegét, hogy a felhasználó számára egyértelmű legyen a funkciója.
+kont.appendChild(exportGomb); // Hozzáadjuk a gombot a fő konténer div-hez.
+// Hozzáadunk egy eseményfigyelőt a gombhoz, amely akkor aktiválódik, amikor a felhasználó rákattint.
+
+exportGomb.addEventListener('click', () => {
+    // Létrehozunk egy <a> elemet, amely a fájl letöltéséhez szükséges.
+    const letoltesLink = document.createElement('a'); // Új <a> elem létrehozása.
+
+    // Létrehozunk egy tömböt, amely a CSV fájl tartalmát fogja tárolni.
+    const tartalomTomb = ['forradalom;evszam;sikeres']; // Az első sor a fejléc, amely a mezők neveit tartalmazza.
+
+    // Végigiterálunk a `tomb` tömbön, amely az exportálni kívánt adatokat tartalmazza.
+    for (const adat of tomb) {
+        // Minden objektum adatait pontosvesszővel elválasztva hozzáadjuk a tartalom tömbhöz.
+        tartalomTomb.push(`${adat.revolution};${adat.year};${adat.successful === 'yes' ? 'igen' : 'nem'}`);
+    }
+
+    // A tömb elemeit egyetlen szöveggé alakítjuk, ahol az elemeket új sor választja el.
+    const tartalom = tartalomTomb.join('\n'); // Az elemeket új sor (`\n`) karakterrel választjuk el.
+
+    // Létrehozunk egy új Blob objektumot, amely a fájl tartalmát tárolja.
+    const fajl = new Blob([tartalom]); // A Blob az adatokat bináris formában tárolja.
+
+    // Beállítjuk a letöltési linket a Blob objektumra.
+    letoltesLink.href = URL.createObjectURL(fajl); // A Blob objektumot URL-é alakítjuk, amely a fájl letöltésére használható.
+    letoltesLink.download = 'adatok.csv'; // Beállítjuk a letöltendő fájl nevét.
+
+    // Automatikusan kattintást szimulálunk a letöltési linkre, hogy elindítsuk a letöltést.
+    letoltesLink.click(); // A linkre kattintás elindítja a fájl letöltését.
+
+    // Felszabadítjuk az URL-t, hogy ne foglaljon feleslegesen memóriát.
+    URL.revokeObjectURL(letoltesLink.href); // Az URL-t érvénytelenítjük, miután már nincs rá szükség.
+});
