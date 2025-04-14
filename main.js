@@ -10,11 +10,11 @@ const tomb = [];
 const letrehozDiv = (osztaly) => {
     // A 'document.createElement' metódussal egy új <div> elemet hozunk létre.
     const d = document.createElement('div');
-    
+
     // Az újonnan létrehozott <div> elem 'className' attribútumát beállítjuk
     // a függvény paraméterként kapott 'osztaly' értékére, hogy a megfelelő CSS stílusok érvényesülhessenek.
     d.className = osztaly;
-    
+
     // A konfigurált <div> elemet visszaadjuk, így a hívó kód később felhasználhatja azt.
     return d;
 };
@@ -56,10 +56,10 @@ const fejlecMezok = ['forradalom', 'évszám', 'sikeres'];
 for (const szoveg of fejlecMezok) {
     // Egy új <th> cella létrehozása
     const cella = document.createElement('th');
-    
+
     // A cella szövegének beállítása
     cella.innerText = szoveg;
-    
+
     // A cellát hozzáadjuk a fejléc sorához
     fejlecSor.appendChild(cella);
 }
@@ -153,6 +153,11 @@ for (const mezo of mezoAdatLista) {
         // Hozzáadjuk az input mezőt a megfelelő divhez
         mezoDiv.appendChild(inputElem);
     }
+    // Létrehozunk egy <span> elemet az .error osztállyal a hibaüzenetek megjelenítéséhez
+    const errorElem = document.createElement('span');
+    errorElem.className = 'error'; //error ossztály megjelenitése
+    mezoDiv.appendChild(errorElem); // Hozzáadjuk a szülő div-hez
+
 }
 
 
@@ -174,55 +179,100 @@ urlap.addEventListener('submit', (esemeny) => {
     // Lekérjük az összes <input> mezőt, amely az eseményt kiváltó <form>-on belül található.
     const inputMezok = esemeny.target.querySelectorAll('input');
 
+    // Létrehozunk egy változót, amely jelzi, hogy az űrlap valid-e (érvényes-e).
+    let valid = true;
+
     // Végigmegyünk az összes <input> mezőn, és az ID-ját kulcsként, az értékét pedig értékként eltároljuk az objektumban.
     for (const inputMezo of inputMezok) {
+        // Az aktuális input mező szülő div-jében keressük az .error osztályú elemet, amely a hibaüzenetek megjelenítésére szolgál.
+        const error = inputMezo.parentElement.querySelector('.error');
+    
+        // Ha nincs .error osztályú elem az input mező szülőjében, akkor hibát jelezünk a konzolban, és kilépünk a függvényből.
+        if (!error) {
+            console.error('Nincs error mező definiálva!');
+            return;
+        }
+    
+        // Töröljük az előző hibaüzenetet, hogy ne jelenjen meg régi hibaüzenet az új validáció során.
+        error.textContent = '';
+    
+        // Ellenőrizzük, hogy az input mező üres-e (nincs-e kitöltve).
+        if (inputMezo.value === '') {
+            // Ha az input mező üres, akkor hibaüzenetet jelenítünk meg az .error elemben.
+            error.textContent = 'Kötelező megadni';
+            // Az űrlapot érvénytelennek jelöljük.
+            valid = false;
+        }
+    
+        // Ha az input mező nem üres, akkor az értékét hozzáadjuk az objektumhoz az input mező ID-jával mint kulccsal.
         urlapAdatokObjektum[inputMezo.id] = inputMezo.value;
-    }
+    } 
 
-    // Lekérjük az egyetlen <select> mezőt az űrlapon belül.
+    // Lekérjük az egyetlen <select> mezőt az űrlapon belül, amely a legördülő menüt képviseli.
     const selectElem = esemeny.target.querySelector('select');
 
-    // A legördülő mező értékét is hozzáadjuk az objektumhoz (pl. "yes" vagy "no").
+    // Az aktuális <select> mező szülő div-jében keressük az .error osztályú elemet a hibaüzenetek megjelenítésére.
+    const selectError = selectElem.parentElement.querySelector('.error');
+
+    // Ha nincs .error osztályú elem a <select> mező szülőjében, akkor hibát jelezünk a konzolban, és kilépünk a függvényből.
+    if (!selectError) {
+    console.error('Nincs error mező definiálva a select elemhez!');
+    return;
+    }
+
+    // Töröljük az előző hibaüzenetet a <select> mezőhöz tartozó .error elemből.
+    selectError.textContent = '';
+
+    // Ellenőrizzük, hogy a <select> mező értéke üres-e (nincs-e kiválasztva semmi).
+    if (selectElem.value === '') {
+    // Ha a <select> mező értéke üres, akkor hibaüzenetet jelenítünk meg az .error elemben.
+    selectError.textContent = 'Kötelező kiválasztani';
+    // Az űrlapot érvénytelennek jelöljük.
+    valid = false;
+    }
+
+    // Ha a <select> mező értéke nem üres, akkor az értékét hozzáadjuk az objektumhoz a mező ID-jával mint kulccsal.
     urlapAdatokObjektum[selectElem.id] = selectElem.value;
 
-    // Az összegyűjtött adatokat (az objektumot) elmentjük egy globális tömbbe, hogy később is elérhető legyen.
-    tomb.push(urlapAdatokObjektum);
 
-    // Létrehozunk egy új táblázatsort (<tr>), amely majd a <tbody> részhez kerül.
-    const tablaTorzsSor = document.createElement('tr');
+    if (valid) {
+        // Az összegyűjtött adatokat (az objektumot) elmentjük egy globális tömbbe, hogy később is elérhető legyen.
+        tomb.push(urlapAdatokObjektum);
 
-    // Hozzáadjuk a létrehozott sort a táblázat törzséhez (tbody).
-    tablaTest.appendChild(tablaTorzsSor);
+        // Létrehozunk egy új táblázatsort (<tr>), amely majd a <tbody> részhez kerül.
+        const tablaTorzsSor = document.createElement('tr');
 
-    // Létrehozunk egy új <td> cellát a 'revolution' mező adatának (pl. 1848).
-    const forradalomCell = document.createElement('td');
+        // Hozzáadjuk a létrehozott sort a táblázat törzséhez (tbody).
+        tablaTest.appendChild(tablaTorzsSor);
 
-    // Beállítjuk a cella szövegét a beküldött adat alapján.
-    forradalomCell.textContent = urlapAdatokObjektum.revolution;
+        // Létrehozunk egy új <td> cellát a 'revolution' mező adatának (pl. 1848).
+        const forradalomCell = document.createElement('td');
 
-    // Hozzáadjuk ezt a cellát a sorhoz.
-    tablaTorzsSor.appendChild(forradalomCell);
+        // Beállítjuk a cella szövegét a beküldött adat alapján.
+        forradalomCell.textContent = urlapAdatokObjektum.revolution;
 
-    // Létrehozunk egy új <td> cellát az 'year' mező adatának.
-    const evszamCell = document.createElement('td');
+        // Hozzáadjuk ezt a cellát a sorhoz.
+        tablaTorzsSor.appendChild(forradalomCell);
 
-    // Beállítjuk a cella tartalmát a megfelelő évszám értékre.
-    evszamCell.textContent = urlapAdatokObjektum.year;
+        // Létrehozunk egy új <td> cellát az 'year' mező adatának.
+        const evszamCell = document.createElement('td');
 
-    // Hozzáadjuk az évszám cellát a táblázatsorhoz.
-    tablaTorzsSor.appendChild(evszamCell);
+        // Beállítjuk a cella tartalmát a megfelelő évszám értékre.
+        evszamCell.textContent = urlapAdatokObjektum.year;
 
-    // Létrehozunk egy új <td> cellát a 'successful' mező adatának (sikeres volt-e a forradalom).
-    const sikeresCell = document.createElement('td');
+        // Hozzáadjuk az évszám cellát a táblázatsorhoz.
+        tablaTorzsSor.appendChild(evszamCell);
 
-    // A sikeresség értékét "igen" vagy "nem" formában jelenítjük meg a cellában a 'yes'/'no' érték alapján.
-    sikeresCell.textContent = urlapAdatokObjektum.successful === 'yes' ? 'igen' : 'nem';
+        // Létrehozunk egy új <td> cellát a 'successful' mező adatának (sikeres volt-e a forradalom).
+        const sikeresCell = document.createElement('td');
 
-    // Hozzáadjuk a sikerességet tartalmazó cellát a sorhoz.
-    tablaTorzsSor.appendChild(sikeresCell);
+        // A sikeresség értékét "igen" vagy "nem" formában jelenítjük meg a cellában a 'yes'/'no' érték alapján.
+        sikeresCell.textContent = urlapAdatokObjektum.successful === 'yes' ? 'igen' : 'nem';
+
+        // Hozzáadjuk a sikerességet tartalmazó cellát a sorhoz.
+        tablaTorzsSor.appendChild(sikeresCell);
+    }
 });
-
-
 
 kont.appendChild(tabl);   // a táblázatos rész hozzáadása
 kont.appendChild(formD);  // az űrlapos rész hozzáadása
