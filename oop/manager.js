@@ -37,4 +37,23 @@ class RevolutionHandler {
             this.#onRevolutionAdded(revolution);
         }
     }
+
+    /**
+    * Generál egy CSV formátumú szöveget a forradalmak listájából.
+    * @returns {string} A forradalmak listája CSV formátumban.
+    */
+    generateExportString() {
+        // A fejléc sor létrehozása
+        const eredmeny = ['forradalom;evszam;sikeres']; // A fejléc mezőneveket tartalmazza.
+
+        // Végigiterálunk a belső tömbön (#revolutionList), amely a forradalmak adatait tartalmazza.
+        for (const forradalom of this.#revolutionList) {
+            // Minden forradalom adatait pontosvesszővel elválasztva hozzáadjuk az eredmény tömbhöz.
+            eredmeny.push(`${forradalom.forradalom};${forradalom.evszam};${forradalom.sikeres ? 'igen' : 'nem'}`);
+        }
+
+        // A tömb elemeit egyetlen szöveggé alakítjuk, ahol az elemeket új sor választja el.
+        return eredmeny.join('\n'); // Az elemeket új sor (`\n`) karakterrel választjuk el.
+    }
+
 }

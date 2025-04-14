@@ -24,4 +24,4 @@ const table = new Tablazat('table',manager);
 // Az 'form' osztályú div elemet hozunk létre, amely az OOP alapú struktúrához tartozik, és az űrlapok kezelésére szolgál.
 // Az űrlap mezőinek beállításait (fieldid és fieldLabel) a mezoBeall tömb tartalmazza.
 const forms = new Urlap('form', mezoBeall,manager);
-const fileUplad = new Feltoltes('upload', manager);
+const fileUplad = new FeltoltesLetoltes('upload', manager);

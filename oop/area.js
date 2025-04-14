@@ -139,11 +139,11 @@ class Tablazat extends Area {
     }
 
 
-     /**
-     * Privát metódus: létrehozza a táblázatot, beleértve a fejlécet és a törzset.
-     * @returns {HTMLTableSectionElement} A táblázat törzse.
-     * @private
-     */
+    /**
+    * Privát metódus: létrehozza a táblázatot, beleértve a fejlécet és a törzset.
+    * @returns {HTMLTableSectionElement} A táblázat törzse.
+    * @private
+    */
     #keszitTabla() {
         const table = document.createElement('table'); // Létrehozzuk a <table> elemet
         this.div.appendChild(table); // A div-be ágyazzuk
@@ -174,12 +174,12 @@ class Urlap extends Area {
 
     #formFieldArray;
 
-     /**
-     * Konstruktor: létrehozza az űrlapot és a mezőket a megadott mezőlista alapján.
-     * @param {string} osztaly - A div CSS osztályneve, amely az űrlapot körülveszi.
-     * @param {Array<{fieldid: string, fieldLabel: string}>} mezoLista - A mezők listája, amelyek az űrlap mezőit definiálják.
-     * @param {RevolutionManager} manager - A manager objektum, amely az űrlap adatait kezeli.
-     */
+    /**
+    * Konstruktor: létrehozza az űrlapot és a mezőket a megadott mezőlista alapján.
+    * @param {string} osztaly - A div CSS osztályneve, amely az űrlapot körülveszi.
+    * @param {Array<{fieldid: string, fieldLabel: string}>} mezoLista - A mezők listája, amelyek az űrlap mezőit definiálják.
+    * @param {RevolutionManager} manager - A manager objektum, amely az űrlap adatait kezeli.
+    */
     constructor(osztaly, mezoLista, manager) {
         // Meghívjuk a Terület konstruktorát.
         super(osztaly, manager);
@@ -256,8 +256,8 @@ class Urlap extends Area {
             const inputMezok = e.target.querySelectorAll('input');
 
             // Végigmegyünk minden input mezőn
-             // Végigiterálunk a FormField példányokon
-             for (const formField of this.#formFieldArray) {
+            // Végigiterálunk a FormField példányokon
+            for (const formField of this.#formFieldArray) {
                 formField.error = ''; // Alapértelmezésben nincs hibaüzenet
                 if (formField.value === '') { // Ellenőrizzük, hogy a mező üres-e
                     formField.error = 'Kötelező megadni'; // Hibaüzenet beállítása
@@ -272,23 +272,23 @@ class Urlap extends Area {
                     Number(valueObject.year), // Évszám
                     valueObject.successful === 'yes' // Sikeresség logikai értékként
                 );
-                 // A létrehozott forradalom objektumot hozzáadjuk a manager-hez (pl. táblázathoz).
+                // A létrehozott forradalom objektumot hozzáadjuk a manager-hez (pl. táblázathoz).
                 this.manager.addRevolution(revolution);
 
-                 // Az űrlapot alaphelyzetbe állítjuk, hogy tiszta mezők jelenjenek meg a felhasználónak.
+                // Az űrlapot alaphelyzetbe állítjuk, hogy tiszta mezők jelenjenek meg a felhasználónak.
                 formElem.reset();
             }
 
         });
     }
-    
+
 }
 
 /**
  * Az `Feltoltes` osztály egy fájl feltöltésére szolgáló funkciót valósít meg.
  * A fájl tartalmát feldolgozza, és a benne található adatokat `Revolution` objektumokká alakítja.
  */
-class Feltoltes extends Area {
+class FeltoltesLetoltes extends Area {
     /**
      * Konstruktor: Létrehozza a fájl feltöltésére szolgáló input mezőt, és beállítja az eseményfigyelőt.
      * @param {string} stilusOsztaly - A div CSS osztályneve, amely a fájl feltöltését körülveszi.
@@ -348,9 +348,36 @@ class Feltoltes extends Area {
                 }
             };
 
-           
+
 
             fajlOlvaso.readAsText(fajl); // Elindítjuk a fájl olvasását szövegként.
+        })
+
+        // Létrehozunk egy új gombot, amely az adatok exportálására szolgál.
+        const letoltesGomb = document.createElement('button'); // Új <button> elem létrehozása.
+        letoltesGomb.textContent = 'Adatok letöltése'; // Beállítjuk a gomb szövegét, hogy a felhasználó számára egyértelmű legyen a funkciója.
+        this.div.appendChild(letoltesGomb); // Hozzáadjuk a gombot az aktuális osztályhoz tartozó div elemhez.
+
+        // Hozzáadunk egy eseményfigyelőt a gombhoz, amely akkor aktiválódik, amikor a felhasználó rákattint.
+        letoltesGomb.addEventListener('click', () => {
+            // Létrehozunk egy <a> elemet, amely a fájl letöltéséhez szükséges.
+            const letoltesLink = document.createElement('a');
+
+            // A manager objektum segítségével generálunk egy exportálható tartalmat.
+            const tartalom = this.manager.generateExportString();
+
+            // Létrehozunk egy új Blob objektumot, amely a fájl tartalmát tárolja.
+            const fajl = new Blob([tartalom]);
+
+            // Beállítjuk a letöltési linket a Blob objektumra.
+            letoltesLink.href = URL.createObjectURL(fajl);
+            letoltesLink.download = 'adatok.csv';
+
+            // Automatikusan kattintást szimulálunk a letöltési linkre, hogy elindítsuk a letöltést.
+            letoltesLink.click();
+
+            // Felszabadítjuk az URL-t, hogy ne foglaljon feleslegesen memóriát.
+            URL.revokeObjectURL(letoltesLink.href);
         });
     }
 }
@@ -360,11 +387,11 @@ class Feltoltes extends Area {
 // A FormField osztály egy űrlapmezőt reprezentál, amely tartalmaz egy címkét (label), egy beviteli mezőt (input) és egy hibaüzenet megjelenítésére szolgáló elemet (span).
 class FormField {
     // Privát mezők deklarálása, amelyek csak az osztályon belül érhetők el.
-     /**
-     * Az űrlapmező azonosítója, amely egyedi az adott mezőhöz.
-     * @type {string}
-     * @private
-     */
+    /**
+    * Az űrlapmező azonosítója, amely egyedi az adott mezőhöz.
+    * @type {string}
+    * @private
+    */
     #id; // Az űrlapmező azonosítója, amely egyedi az adott mezőhöz.
 
     /**
@@ -407,20 +434,20 @@ class FormField {
     }
 
     // Setter metódus a hibaüzenet beállításához, amely lehetővé teszi a hibaüzenet szövegének módosítását.
-      /**
-     * Setter metódus a hibaüzenet beállításához, amely lehetővé teszi a hibaüzenet szövegének módosítását.
-     * @param {string} value - A hibaüzenet szövege.
-     */
+    /**
+   * Setter metódus a hibaüzenet beállításához, amely lehetővé teszi a hibaüzenet szövegének módosítását.
+   * @param {string} value - A hibaüzenet szövege.
+   */
     set error(value) {
         this.#errorElement.textContent = value; // Beállítja a hibaüzenet szövegét a span elemben.
     }
 
     // Konstruktor: inicializálja az osztály példányát, és létrehozza a szükséges HTML elemeket.
-     /**
-     * Konstruktor: inicializálja az osztály példányát, és létrehozza a szükséges HTML elemeket.
-     * @param {string} id - Az űrlapmező egyedi azonosítója.
-     * @param {string} labelContent - A mező címkéjének szövege.
-     */
+    /**
+    * Konstruktor: inicializálja az osztály példányát, és létrehozza a szükséges HTML elemeket.
+    * @param {string} id - Az űrlapmező egyedi azonosítója.
+    * @param {string} labelContent - A mező címkéjének szövege.
+    */
     constructor(id, labelContent) {
         this.#id = id; // Beállítja a mező azonosítóját a kapott ID alapján.
 
@@ -439,10 +466,10 @@ class FormField {
     }
 
     // Metódus, amely visszaad egy div-et, amely tartalmazza az összes HTML elemet (label, input, hibaüzenet).
-     /**
-     * Metódus, amely visszaad egy div-et, amely tartalmazza az összes HTML elemet (label, input, hibaüzenet).
-     * @returns {HTMLDivElement} A mezőt tartalmazó div elem.
-     */
+    /**
+    * Metódus, amely visszaad egy div-et, amely tartalmazza az összes HTML elemet (label, input, hibaüzenet).
+    * @returns {HTMLDivElement} A mezőt tartalmazó div elem.
+    */
     getDiv() {
         const div = document.createElement('div'); // Létrehoz egy új <div> elemet, amely a mező konténere lesz.
         div.classList.add('field'); // Hozzáadja a 'field' osztályt a div-hez, hogy stílusozható legyen.
