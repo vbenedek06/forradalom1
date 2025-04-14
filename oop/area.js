@@ -146,10 +146,14 @@ class Tablazat extends Area {
  * A formon keresztül adatokat lehet megadni, amelyeket a menedzser kezeli.
  */
 class Urlap extends Area {
+
+    #formFieldArray;
+
     constructor(osztaly, mezoLista, manager) {
         // Meghívjuk a Terület konstruktorát.
         super(osztaly, manager);
-
+       // Inicializáljuk a privát tömböt
+       this.#formFieldArray = [];
         // Létrehozunk egy <form> elemet.
         const formElem = document.createElement('form');
         // A form elemet beillesztjük a Terület által létrehozott div-be.
@@ -158,92 +162,53 @@ class Urlap extends Area {
         // Végigiterálunk a mezoLista tömbön, amely objektumokat tartalmaz.
         // Minden objektum egy űrlapmezőt ír le (pl. forradalom, évszám, sikeresség).
         for (const mezo of mezoLista) {
+            if (mezo.fieldid === 'successful') { // Ellenőrizzük, hogy az aktuális mező ID-ja "successful"-e
+                
+                const label = document.createElement('label'); // Létrehozunk egy <label> elemet, amely a mező címkéjét tartalmazza
+                label.htmlFor = mezo.fieldid;// A label 'for' attribútumát az ID-hoz rendeljük, hogy összekapcsolja a select mezővel
+                label.textContent = mezo.fieldLabel; // Beállítjuk a label szövegét a mező címkéjére
 
-            // Létrehozunk egy <div> elemet, amely az aktuális űrlapmező (label + input/select) konténere lesz.
-            const mezoDiv = document.createElement('div');
+                const select = document.createElement('select');// Létrehozunk egy <select> elemet, amely egy legördülő menüt képvisel
+                select.id = mezo.fieldid;// Beállítjuk a select mező ID-ját, hogy egyedi legyen
 
-            // Hozzáadjuk a 'field' CSS osztályt a divhez, ami segíthet a mezők stílusának egységesítésében.
-            mezoDiv.classList.add('field');
+                const opcioIgen = document.createElement('option');// Létrehozzuk az első opciót: "igen"
+                opcioIgen.value = 'yes';// Az opció értéke, amelyet a program használ
+                opcioIgen.textContent = 'igen';// Az opció szövege, amelyet a felhasználó lát
+                select.appendChild(opcioIgen);// Hozzáadjuk az "igen" opciót a select mezőhöz
 
-            // Az új divet hozzáadjuk az űrlaphoz (formElem), így az megjelenik a DOM-ban.
-            formElem.appendChild(mezoDiv);
+                const opcioNem = document.createElement('option'); // Létrehozzuk a második opciót: "nem"
+                opcioNem.value = 'no';// Az opció értéke, amelyet a program használ
+                opcioNem.textContent = 'nem'; // Az opció szövege, amelyet a felhasználó lát
+                select.appendChild(opcioNem);// Hozzáadjuk a "nem" opciót a select mezőhöz
 
-            // Létrehozunk egy <label> elemet, amely az adott mező feliratát tartalmazza.
-            const cimke = document.createElement('label');
+                const errorElem = document.createElement('span'); // Létrehozunk egy <span> elemet, amely a hibaüzenetek megjelenítésére szolgál
+                errorElem.className = 'error';// Hozzáadjuk az 'error' osztályt, hogy stílusozható legyen
 
-            // A label 'for' attribútumát beállítjuk, hogy megegyezzen az input mező ID-jával.
-            // Ezáltal ha a felhasználó rákattint a címkére, az a megfelelő input mezőre fókuszál.
-            cimke.htmlFor = mezo.fieldid;
+                const div = document.createElement('div');   // Létrehozunk egy <div> elemet, amely a mező konténere lesz
+                div.classList.add('field');        /// Hozzáadjuk a 'field' osztályt a div-hez, hogy stílusozható legyen
+                div.appendChild(label); // Hozzáadunk egy sortörést a label és a select mező közé
+                div.appendChild(document.createElement('br'));  // Hozzáadunk egy sortörést a label és a select mező közé
+                div.appendChild(select);// A div-hez hozzáadjuk a select mezőt
+                div.appendChild(document.createElement('br')); // Hozzáadunk egy sortörést a select mező és a hibaüzenet közé
+                div.appendChild(errorElem);// A div-hez hozzáadjuk a hibaüzenet megjelenítésére szolgáló span elemet
 
-            // Beállítjuk a label látható szövegét az objektumból (pl. 'évszám', 'forradalom').
-            cimke.textContent = mezo.fieldLabel;
-
-            // A címkét hozzáadjuk az aktuális divhez, így az megjelenik a mező előtt.
-            mezoDiv.appendChild(cimke);
-
-            // Hozzáadunk egy sortörést, hogy a beviteli mező a címke alatt jelenjen meg.
-            mezoDiv.appendChild(document.createElement('br'));
-
-            // Ellenőrizzük, hogy az aktuális mező a 'sikeres' mező-e.
-            // Ehhez speciális mezőt (legördülő listát) hozunk létre, nem sima szöveges inputot.
-            if (mezo.fieldid === 'successful') {
-
-                // Létrehozunk egy <select> elemet, ami a legördülő menüt reprezentálja.
-                const legordulo = document.createElement('select');
-
-                // Beállítjuk a select ID-ját, hogy egyezzen a label 'for' attribútumával.
-                legordulo.id = mezo.fieldid;
-
-                // Létrehozunk egy <option> elemet az 'igen' választáshoz.
-                const opcioIgen = document.createElement('option');
-
-                // Az opció értéke (amit a program fog kapni) 'yes'.
-                opcioIgen.value = 'yes';
-
-                // A megjelenő szöveg az opcióban: 'igen'.
-                opcioIgen.textContent = 'igen';
-
-                // Hozzáadjuk az 'igen' opciót a select (legördülő) elemhez.
-                legordulo.appendChild(opcioIgen);
-
-                // Létrehozunk egy második <option> elemet a 'nem' választáshoz.
-                const opcioNem = document.createElement('option');
-
-                // Érték: 'no'
-                opcioNem.value = 'no';
-
-                // A felhasználó által látott szöveg: 'nem'.
-                opcioNem.textContent = 'nem';
-
-                // Hozzáadjuk a 'nem' opciót a legördülőhöz.
-                legordulo.appendChild(opcioNem);
-
-                // Végül hozzáadjuk a teljes legördülő mezőt a divhez.
-                mezoDiv.appendChild(legordulo);
-
+                formElem.appendChild(div);// A kész div-et hozzáadjuk az űrlaphoz (formElem)
             } else {
-                // Ha a mező nem 'sikeres', tehát sima szöveg vagy szám mező, akkor input mezőt készítünk.
+                // Ha a mező nem "successful", akkor a FormField osztályt használjuk
+                // Egyéb mezők esetén a FormField osztályt használjuk
+                const formField = new FormField(mezo.fieldid, mezo.fieldLabel); // Létrehozunk egy új FormField példányt az aktuális mező alapján
 
-                // Létrehozunk egy <input> elemet.
-                const inputElem = document.createElement('input');
-
-                // Beállítjuk az input mező ID-ját, hogy kapcsolódjon a label-hez.
-                inputElem.id = mezo.fieldid;
-
-                // Az input mezőt is hozzáadjuk a divhez, így megjelenik az oldalon.
-                mezoDiv.appendChild(inputElem);
+                this.#formFieldArray.push(formField); // Hozzáadjuk a FormField példányt a privát tömbhöz (#formFieldArray)
+                formElem.appendChild(formField.getDiv());// A FormField által generált div-et hozzáadjuk az űrlaphoz (formElem)
             }
         }
+           
 
 
-        // Létrehozunk egy új <button> elemet, amely az űrlap elküldésére fog szolgálni.
+        // Létrehozunk egy <button> elemet az űrlap elküldéséhez
         const gomb = document.createElement('button');
-
-        // A gomb típusát "submit"-re állítjuk, így amikor rákattintunk, az űrlap elküldésének eseményét váltja ki.
-        gomb.type = 'submit';
-
-        // A gomb szövegét beállítjuk, ami a felhasználó számára jelenik meg a gombon.
-        gomb.textContent = 'hozzáadás';
+        gomb.textContent = 'hozzáadás'; // Beállítjuk a gomb szövegét
+        gomb.type = 'submit'; // A gomb típusát "submit"-re állítjuk
 
         // A létrehozott gombot hozzáadjuk az űrlaphoz (formElem).
         formElem.appendChild(gomb);
@@ -286,5 +251,65 @@ class Urlap extends Area {
             formElem.reset();
         });
 
+    }
+}
+
+// A FormField osztály egy űrlapmezőt reprezentál, amely tartalmaz egy címkét (label), egy beviteli mezőt (input) és egy hibaüzenet megjelenítésére szolgáló elemet (span).
+class FormField {
+    // Privát mezők deklarálása, amelyek csak az osztályon belül érhetők el.
+    #id; // Az űrlapmező azonosítója, amely egyedi az adott mezőhöz.
+    #inputElement; // Az input HTML elem, amely a felhasználói adatbevitelre szolgál.
+    #labelElement; // A label HTML elem, amely a mező címkéjét tartalmazza.
+    #errorElement; // A span HTML elem, amely a hibaüzenetek megjelenítésére szolgál.
+
+    // Getter metódus az ID-hoz, amely lehetővé teszi az azonosító lekérdezését kívülről.
+    get id() {
+        return this.#id; // Visszaadja a privát #id mező értékét.
+    }
+
+    // Getter metódus az input mező értékéhez, amely lehetővé teszi a felhasználó által bevitt adat lekérdezését.
+    get value() {
+        return this.#inputElement.value; // Visszaadja az input mező aktuális értékét.
+    }
+
+    // Setter metódus a hibaüzenet beállításához, amely lehetővé teszi a hibaüzenet szövegének módosítását.
+    set error(value) {
+        this.#errorElement.textContent = value; // Beállítja a hibaüzenet szövegét a span elemben.
+    }
+
+    // Konstruktor: inicializálja az osztály példányát, és létrehozza a szükséges HTML elemeket.
+    constructor(id, labelContent) {
+        this.#id = id; // Beállítja a mező azonosítóját a kapott ID alapján.
+
+        // Létrehozza a label elemet, amely a mező címkéjét tartalmazza.
+        this.#labelElement = document.createElement('label'); // Új <label> elem létrehozása.
+        this.#labelElement.htmlFor = id; // A label 'for' attribútumát az ID-hoz rendeli, hogy összekapcsolja az input mezővel.
+        this.#labelElement.textContent = labelContent; // Beállítja a label szövegét a kapott tartalom alapján.
+
+        // Létrehozza az input elemet, amely a felhasználói adatbevitelre szolgál.
+        this.#inputElement = document.createElement('input'); // Új <input> elem létrehozása.
+        this.#inputElement.id = id; // Beállítja az input mező ID-ját, hogy egyedi legyen.
+
+        // Létrehozza a hibaüzenet megjelenítésére szolgáló span elemet.
+        this.#errorElement = document.createElement('span'); // Új <span> elem létrehozása.
+        this.#errorElement.className = 'error'; // Hozzáadja az 'error' osztályt a span elemhez, hogy stílusozható legyen.
+    }
+
+    // Metódus, amely visszaad egy div-et, amely tartalmazza az összes HTML elemet (label, input, hibaüzenet).
+    getDiv() {
+        const div = document.createElement('div'); // Létrehoz egy új <div> elemet, amely a mező konténere lesz.
+        div.classList.add('field'); // Hozzáadja a 'field' osztályt a div-hez, hogy stílusozható legyen.
+
+        // Létrehoz két sortörést, hogy a mező elemei (label, input, hibaüzenet) egymás alatt jelenjenek meg.
+        const br1 = document.createElement('br'); // Első sortörés létrehozása.
+        const br2 = document.createElement('br'); // Második sortörés létrehozása.
+
+        // Az összes HTML elemet (label, sortörés, input, sortörés, hibaüzenet) hozzáadja a div-hez.
+        const htmlElements = [this.#labelElement, br1, this.#inputElement, br2, this.#errorElement];
+        for (const element of htmlElements) {
+            div.appendChild(element); // Az aktuális elemet hozzáadja a div-hez.
+        }
+
+        return div; // Visszaadja a kész div-et, amely tartalmazza az összes elemet.
     }
 }
