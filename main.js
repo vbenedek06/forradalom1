@@ -276,3 +276,70 @@ urlap.addEventListener('submit', (esemeny) => {
 
 kont.appendChild(tabl);   // a táblázatos rész hozzáadása
 kont.appendChild(formD);  // az űrlapos rész hozzáadása
+
+
+// Létrehozunk egy fájl input mezőt
+const fajlInput = document.createElement('input'); // Új <input> elem létrehozása
+fajlInput.id = 'fajlinput'; // Beállítjuk az input mező ID-ját
+fajlInput.type = 'file'; // Az input mező típusát fájl feltöltésre állítjuk
+
+// Hozzáadjuk a fájl input mezőt a fő konténer div-hez
+kont.appendChild(fajlInput);
+// Hozzáadunk egy eseményfigyelőt a fájl input mezőhöz, amely akkor aktiválódik, amikor a felhasználó fájlt választ
+fajlInput.addEventListener('change', (esemeny) => {
+    // Lekérjük a kiválasztott fájlt az esemény objektumából
+    const fajl = esemeny.target.files[0]; // Az `esemeny.target.files` egy fájlokat tartalmazó lista, az első fájlt választjuk ki
+
+    // Létrehozunk egy FileReader példányt, amely lehetővé teszi a fájl tartalmának olvasását
+    const fajlOlvaso = new FileReader();
+
+    // Amikor a fájl betöltődött, végrehajtjuk a következő műveleteket
+    fajlOlvaso.onload = () => {
+        // A fájl tartalmát sorokra bontjuk az `\n` (újsor) karakter alapján
+        const fajlSorok = fajlOlvaso.result.split('\n');
+
+        // Az első sort (fejléc) eltávolítjuk, mert az nem tartalmaz adatokat
+        const fejlecNelkul = fajlSorok.slice(1);
+
+        // Végigiterálunk a fájl sorain, hogy feldolgozzuk az adatokat
+        for (const sor of fejlecNelkul) {
+            // Levágjuk a felesleges szóközöket a sor elejéről és végéről
+            const vagottSor = sor.trim();
+
+            // A sort mezőkre bontjuk pontosvessző (`;`) mentén
+            const mezok = vagottSor.split(';');
+
+            // Létrehozunk egy objektumot az aktuális sor adataival
+            const revolution = {
+                revolution: mezok[0], // Az első mező a forradalom neve
+                year: mezok[1], // A második mező az évszám
+                successful: mezok[2] === 'yes' // A harmadik mező a sikeresség, logikai értékké alakítva
+            };
+
+            // Hozzáadjuk az objektumot a globális tömbhöz, hogy később is elérhető legyen
+            tomb.push(revolution);
+
+            // Létrehozunk egy új táblázatsort (<tr>), amely majd a táblázat törzséhez kerül
+            const tablaSor = document.createElement('tr');
+            tablaTest.appendChild(tablaSor); // Hozzáadjuk a sort a táblázat törzséhez
+
+            // Létrehozunk egy cellát a forradalom nevéhez, és hozzáadjuk a táblázatsorhoz
+            const forradalomCella = document.createElement('td');
+            forradalomCella.textContent = revolution.revolution; // A cella szövegét a forradalom neve adja
+            tablaSor.appendChild(forradalomCella); // Hozzáadjuk a cellát a sorhoz
+
+            // Létrehozunk egy cellát az évszámhoz, és hozzáadjuk a táblázatsorhoz
+            const evszamCella = document.createElement('td');
+            evszamCella.textContent = revolution.year; // A cella szövegét az évszám adja
+            tablaSor.appendChild(evszamCella); // Hozzáadjuk a cellát a sorhoz
+
+            // Létrehozunk egy cellát a sikerességhez, és hozzáadjuk a táblázatsorhoz
+            const sikeresCella = document.createElement('td');
+            sikeresCella.textContent = revolution.successful ? 'igen' : 'nem'; // A cella szövege "igen" vagy "nem" lesz a sikeresség alapján
+            tablaSor.appendChild(sikeresCella); // Hozzáadjuk a cellát a sorhoz
+        }
+    };
+
+    // Elindítjuk a fájl olvasását szövegként
+    fajlOlvaso.readAsText(fajl);
+});
