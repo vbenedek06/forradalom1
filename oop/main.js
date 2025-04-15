@@ -25,3 +25,6 @@ const table = new Tablazat('table',manager);
 // Az űrlap mezőinek beállításait (fieldid és fieldLabel) a mezoBeall tömb tartalmazza.
 const forms = new Urlap('form', mezoBeall,manager);
 const fileUplad = new FeltoltesLetoltes('upload', manager);
+const filterOop = new Filter('filter', manager);//létrehoz egy új példányt a `Filter` osztályból, amely egy szűrő űrlapot reprezentál.
+// - Az első paraméter ('filter') a CSS osztálynév, amelyet a szűrőhöz tartozó div elemhez rendel.
+// - A második paraméter (`manager`) egy `RevolutionHandler` példány, amely a forradalmak kezeléséért felel.

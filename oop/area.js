@@ -103,7 +103,7 @@ class Tablazat extends Area {
 
         // Meghívjuk a privát metódust, amely létrehozza a táblázat DOM struktúráját.
         // Visszatér egy <tbody> vagy más HTML elem referenciájával, amibe majd a sorokat tesszük.
-        const tablaTest = this.#keszitTabla();
+        const tablaTest = this.keszitTabla();
 
         // Beállítunk egy callback függvényt a manager objektumon.
         // Ez akkor hívódik meg, amikor új forradalom kerül hozzáadásra.
@@ -136,15 +136,45 @@ class Tablazat extends Area {
             // Végül a kész sort hozzáadjuk a táblázat test részéhez, így megjelenik a lapon.
             tablaTest.appendChild(tablaSor);
         });
+
+        // Új callback a táblázat újrarendereléséhez
+        this.manager.setRenderTableCallback((revolutionArray) => {
+            // Kiüríti a táblázat törzsét, hogy csak a szűrt elemek jelenjenek meg.
+            tablaTest.innerHTML = ''; // A táblázat törzsét (tbody) teljesen kiüríti, hogy az új elemek kerüljenek megjelenítésre.
+
+            // Végigiterál a szűrt forradalmak listáján, és minden elemet hozzáad a táblázathoz.
+            for (const revolution of revolutionArray) {
+                // Létrehoz egy új táblázatsort (<tr>) az aktuális forradalom adataihoz.
+                const tablaSor = document.createElement('tr'); // Egy új <tr> elem jön létre, amely a táblázat egy sorát képviseli.
+
+                // Létrehoz egy cellát (<td>) a forradalom nevének megjelenítésére.
+                const forradalomCell = document.createElement('td'); // Egy új <td> elem jön létre, amely a forradalom nevét tartalmazza.
+                forradalomCell.textContent = revolution.forradalom; // A cella szövegét az aktuális forradalom neve adja.
+                tablaSor.appendChild(forradalomCell); // A cellát hozzáadja az aktuális táblázatsorhoz.
+
+                // Létrehoz egy cellát (<td>) az évszám megjelenítésére.
+                const evszamCell = document.createElement('td'); // Egy új <td> elem jön létre, amely az évszámot tartalmazza.
+                evszamCell.textContent = revolution.evszam; // A cella szövegét az aktuális forradalom évszáma adja.
+                tablaSor.appendChild(evszamCell); // A cellát hozzáadja az aktuális táblázatsorhoz.
+
+                // Létrehoz egy cellát (<td>) a sikeresség megjelenítésére.
+                const sikeresCell = document.createElement('td'); // Egy új <td> elem jön létre, amely a sikerességet tartalmazza.
+                sikeresCell.textContent = revolution.sikeres ? 'igen' : 'nem'; // Ha a forradalom sikeres, 'igen'-t ír ki, különben 'nem'-et.
+                tablaSor.appendChild(sikeresCell); // A cellát hozzáadja az aktuális táblázatsorhoz.
+
+                // A kész táblázatsort hozzáadja a táblázat törzséhez (tbody).
+                tablaTest.appendChild(tablaSor); // A táblázatsor megjelenik a táblázat törzsében.
+            }
+        });
+    
     }
 
-
-    /**
-    * Privát metódus: létrehozza a táblázatot, beleértve a fejlécet és a törzset.
-    * @returns {HTMLTableSectionElement} A táblázat törzse.
-    * @private
-    */
-    #keszitTabla() {
+        /**
+        * Privát metódus: létrehozza a táblázatot, beleértve a fejlécet és a törzset.
+        * @returns {HTMLTableSectionElement} A táblázat törzse.
+        * @private
+        */
+    keszitTabla() {
         const table = document.createElement('table'); // Létrehozzuk a <table> elemet
         this.div.appendChild(table); // A div-be ágyazzuk
         const thead = document.createElement('thead'); // Fejléc létrehozása
@@ -154,14 +184,15 @@ class Tablazat extends Area {
         const theadCells = ['forradalom', 'évszám', 'sikeres']; // Fejléc oszlopnevek
         for (const cellContent of theadCells) {
             const thcell = document.createElement('th'); // Új fejléc cella létrehozása
-            thcell.innerText = cellContent;               // A cella szövege
-            theadRow.appendChild(thcell);                 // A cellát hozzáadjuk a sorhoz
+            thcell.innerText = cellContent; // A cella szövege
+            theadRow.appendChild(thcell); // A cellát hozzáadjuk a sorhoz
         }
         const tbody = document.createElement('tbody'); // A táblázat törzse
         table.appendChild(tbody); // Hozzáadjuk a táblázathoz
         return tbody; // Visszaadjuk a táblázat törzsét
     }
 }
+
 
 
 
