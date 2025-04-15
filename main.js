@@ -1,487 +1,295 @@
-const tomb = [];
- 
-/**
-* Létrehoz egy div HTML elemet a megadott CSS osztállyal.
-* @param {string} osztaly - A div elemhez rendelt CSS osztály neve.
-* @returns {HTMLDivElement} - A létrehozott div HTML elemet adja vissza.
-* @callback letrehozDiv
-*/
-const letrehozDiv = (osztaly) => {
-    // A 'document.createElement' metódussal egy új <div> elemet hozunk létre.
-    const d = document.createElement('div');
- 
-    // Az újonnan létrehozott <div> elem 'className' attribútumát beállítjuk
-    // a függvény paraméterként kapott 'osztaly' értékére, hogy a megfelelő CSS stílusok érvényesülhessenek.
-    d.className = osztaly;
- 
-    // A konfigurált <div> elemet visszaadjuk, így a hívó kód később felhasználhatja azt.
-    return d;
-};
- 
-// Létrehozzuk a fő konténerelemet, amely minden további elemet tárol majd.
-// A 'container' osztálynév itt azt jelzi, hogy ez az elem az oldal fő tartója.
-const kont = letrehozDiv('container-sima');
- 
-// A 'document.body.appendChild' metódussal a létrehozott konténer elemet hozzáadjuk a dokumentum <body> részéhez,
-// így a böngészőben megjelenik a kialakított fő tartó.
-document.body.appendChild(kont);
- 
-// Létrehozunk egy elemet a táblázatos adatok megjelenítésére.
-// A 'table' osztálynév azt jelöli, hogy ide kerül a táblázat vagy listázott adatok.
-const tabl = letrehozDiv('table');
- 
-// Létrehozzuk magát a <table> HTML elemet, amely a táblázat struktúráját adja
-const tablaElem = document.createElement('table');
- 
-// A <table> elemet beágyazzuk a táblázat divbe
-tabl.appendChild(tablaElem);
- 
-// Létrehozzuk a táblázat fejléceit tartalmazó <thead> részt
-const fejlec = document.createElement('thead');
- 
-// A <thead> elemet hozzáadjuk a táblázathoz
-tablaElem.appendChild(fejlec);
- 
-// Létrehozunk egy sort (<tr>) a fejlécen belül
-const fejlecSor = document.createElement('tr');
- 
-// A sort hozzáadjuk a fejléc (<thead>) elemhez
-fejlec.appendChild(fejlecSor);
- 
-// A fejléc cellák tartalmát tömbben definiáljuk
-const fejlecMezok = ['forradalom', 'évszám', 'sikeres'];
- 
-// Végigmegyünk a mezőkön, és létrehozzuk a <th> cellákat a sorban
-for (const szoveg of fejlecMezok) {
-    // Egy új <th> cella létrehozása
-    const cella = document.createElement('th');
- 
-    // A cella szövegének beállítása
-    cella.innerText = szoveg;
- 
-    // A cellát hozzáadjuk a fejléc sorához
-    fejlecSor.appendChild(cella);
-}
- 
-// Létrehozzuk a <tbody> részt, ahol a dinamikusan hozzáadott adatok fognak megjelenni
-const tablaTest = document.createElement('tbody');
- 
-// A <tbody> elemet hozzáadjuk a táblázathoz
-tablaElem.appendChild(tablaTest);
- 
- 
-// Létrehozunk egy elemet az űrlap (adatbevitel) megjelenítéséhez: egy div-et, mely az űrlapot tartalmazza
-const formD = letrehozDiv('form');
- 
-// Létrehozunk egy <form> elemet, amelybe az űrlap elemek kerülnek
-const urlap = document.createElement('form');
-// FONTOS: A <form> elemet a már létrehozott formD div-hez kell hozzáfűzni,
-// nem egy nem létező "urlapDiv"-hez!
-formD.appendChild(urlap);
- 
-// Definiáljuk az űrlap mezőit tartalmazó tömböt, ahol minden objektum egy mező adatait tartalmazza
-const mezoAdatLista = [
-    { fieldid: 'revolution', fieldLabel: 'forradalom' }, // Egy objektum amely a 'name' mezőhöz tartozó azonosítót és címkét tartalmazza
-    { fieldid: 'year', fieldLabel: 'evszam' }, // Egy objektum amely a 'birth'  mezőhöz tartozó azonosítót és címkét tartalmazza
-    { fieldid: 'successful', fieldLabel: 'sikeres' } // Egy objektum amely az 'zipcode' mezőhöz tartozó azonosítót és címkét tartalmazza
-];
- 
-// Végigmegyünk a mezoAdatLista tömb minden egyes elemén (egy mező konfiguráción)
-// A ciklus minden lépésében a `mezo` változó az aktuális objektumot tartalmazza (pl. { fieldid: 'year', fieldLabel: 'evszam' })
-for (const mezo of mezoAdatLista) {
- 
-    // Létrehozunk egy új <div> elemet, amely az aktuális beviteli mező köré kerül
-    // Ez a div segít strukturálni és szétválasztani a mezőket vizuálisan (pl. külön sorba helyezni)
-    const mezoDiv = letrehozDiv('field');
- 
-    // Az előbb létrehozott divet hozzáadjuk a <form> elemhez, vagyis mostantól része lesz az űrlapnak
-    urlap.appendChild(mezoDiv);
- 
-    // Létrehozunk egy <label> elemet, ami a beviteli mező felirata lesz (pl. "évszám")
-    const cimke = document.createElement('label');
- 
-    // Beállítjuk a címke 'for' attribútumát, hogy kapcsolódjon a hozzá tartozó input elemhez
-    // Ez az attribútum segít az elérhetőségben, és lehetővé teszi, hogy a címkére kattintva fókuszba kerüljön a mező
-    cimke.htmlFor = mezo.fieldid;
- 
-    // A címke látható szövegét beállítjuk az aktuális mezőhöz tartozó címkére (pl. 'évszam')
-    cimke.textContent = mezo.fieldLabel;
- 
-    // A címkét hozzáadjuk a divhez, tehát megjelenik a mező felett/szélén
-    mezoDiv.appendChild(cimke);
- 
-    // Hozzáadunk egy <br> (sortörés) elemet, hogy az input mező a címke alatt jelenjen meg
-    mezoDiv.appendChild(document.createElement('br'));
- 
-    // Ellenőrizzük, hogy az aktuális mező a 'sikeres' mező-e, mert ez speciális kezelésű: nem szöveg, hanem legördülő
-    if (mezo.fieldid === 'successful') {
- 
-        // Létrehozunk egy <select> elemet, ami egy legördülő menüt képvisel
-        const legordulo = document.createElement('select');
- 
-        // Beállítjuk az ID-ját, hogy egyedi legyen és lehessen rá hivatkozni (pl. label, JS műveletek)
-        legordulo.id = mezo.fieldid;
- 
-        // Létrehozzuk az első opciót: 'igen', ami azt jelzi, hogy sikeres volt a forradalom
-        const opcioIgen = document.createElement('option');
-        opcioIgen.value = 'yes'; // A program által kezelt érték
-        opcioIgen.textContent = 'igen'; // A felhasználó által látott felirat
- 
-        // Hozzáadjuk az 'igen' opciót a <select> (legördülő) elemhez
-        legordulo.appendChild(opcioIgen);
- 
-        // Létrehozzuk a második opciót: 'nem', ami azt jelenti, hogy nem volt sikeres
-        const opcioNem = document.createElement('option');
-        opcioNem.value = 'no'; // Programozás szempontjából ez az érték kerül továbbításra
-        opcioNem.textContent = 'nem'; // A felhasználó ezt fogja látni a listában
- 
-        // A 'nem' opciót is hozzáadjuk a legördülőhöz
-        legordulo.appendChild(opcioNem);
- 
-        // Végül a kész legördülő mezőt is hozzáadjuk a mező-divhez
-        mezoDiv.appendChild(legordulo);
-    } else {
-        // Ha az aktuális mező nem 'sikeres', akkor egy sima szöveges input mezőt hozunk létre
- 
-        // Létrehozunk egy <input> elemet (pl. forradalom neve vagy évszám megadására)
-        const inputElem = document.createElement('input');
- 
-        // Beállítjuk az input mező ID-ját, hogy hivatkozni lehessen rá (pl. label vagy JS kód által)
-        inputElem.id = mezo.fieldid;
- 
-        // Hozzáadjuk az input mezőt a megfelelő divhez
-        mezoDiv.appendChild(inputElem);
-    }
-    // Létrehozunk egy <span> elemet az .error osztállyal a hibaüzenetek megjelenítéséhez
-    const errorElem = document.createElement('span');
-    errorElem.className = 'error'; //error ossztály megjelenitése
-    mezoDiv.appendChild(errorElem); // Hozzáadjuk a szülő div-hez
- 
-}
- 
- 
-// Létrehozunk egy <button> elemet, mely lehetővé teszi az adat beküldését vagy egy sor hozzáadását
-const gomb = document.createElement('button');
-// Beállítjuk a gomb szövegét, hogy a felhasználó számára egyértelmű legyen a funkciója
-gomb.textContent = 'hozzáadás';
-// Hozzáadjuk a gombot a <form> elemhez
-urlap.appendChild(gomb);
-// Hozzáadunk egy eseményfigyelőt a <form> elemhez, amely akkor fut le, amikor a felhasználó beküldi az űrlapot.
-urlap.addEventListener('submit', (esemeny) => {
- 
-    // Megakadályozzuk az űrlap alapértelmezett viselkedését (ne töltse újra az oldalt).
-    esemeny.preventDefault();
- 
-    // Létrehozunk egy üres objektumot, amibe az űrlapmezők adatait fogjuk gyűjteni.
-    const urlapAdatokObjektum = {};
- 
-    // Lekérjük az összes <input> mezőt, amely az eseményt kiváltó <form>-on belül található.
-    const inputMezok = esemeny.target.querySelectorAll('input');
- 
-    // Létrehozunk egy változót, amely jelzi, hogy az űrlap valid-e (érvényes-e).
-    let valid = true;
- 
-    // Végigmegyünk az összes <input> mezőn, és az ID-ját kulcsként, az értékét pedig értékként eltároljuk az objektumban.
-    for (const inputMezo of inputMezok) {
-        // Az aktuális input mező szülő div-jében keressük az .error osztályú elemet, amely a hibaüzenetek megjelenítésére szolgál.
-        const error = inputMezo.parentElement.querySelector('.error');
-    
-        // Ha nincs .error osztályú elem az input mező szülőjében, akkor hibát jelezünk a konzolban, és kilépünk a függvényből.
-        if (!error) {
-            console.error('Nincs error mező definiálva!');
-            return;
-        }
-    
-        // Töröljük az előző hibaüzenetet, hogy ne jelenjen meg régi hibaüzenet az új validáció során.
-        error.textContent = '';
-    
-        // Ellenőrizzük, hogy az input mező üres-e (nincs-e kitöltve).
-        if (inputMezo.value === '') {
-            // Ha az input mező üres, akkor hibaüzenetet jelenítünk meg az .error elemben.
-            error.textContent = 'Kötelező megadni';
-            // Az űrlapot érvénytelennek jelöljük.
-            valid = false;
-        }
-    
-        // Ha az input mező nem üres, akkor az értékét hozzáadjuk az objektumhoz az input mező ID-jával mint kulccsal.
-        urlapAdatokObjektum[inputMezo.id] = inputMezo.value;
-    }
- 
-    // Lekérjük az egyetlen <select> mezőt az űrlapon belül, amely a legördülő menüt képviseli.
-    const selectElem = esemeny.target.querySelector('select');
- 
-    // Az aktuális <select> mező szülő div-jében keressük az .error osztályú elemet a hibaüzenetek megjelenítésére.
-    const selectError = selectElem.parentElement.querySelector('.error');
- 
-    // Ha nincs .error osztályú elem a <select> mező szülőjében, akkor hibát jelezünk a konzolban, és kilépünk a függvényből.
-    if (!selectError) {
-    console.error('Nincs error mező definiálva a select elemhez!');
-    return;
-    }
- 
-    // Töröljük az előző hibaüzenetet a <select> mezőhöz tartozó .error elemből.
-    selectError.textContent = '';
- 
-    // Ellenőrizzük, hogy a <select> mező értéke üres-e (nincs-e kiválasztva semmi).
-    if (selectElem.value === '') {
-    // Ha a <select> mező értéke üres, akkor hibaüzenetet jelenítünk meg az .error elemben.
-    selectError.textContent = 'Kötelező kiválasztani';
-    // Az űrlapot érvénytelennek jelöljük.
-    valid = false;
-    }
- 
-    // Ha a <select> mező értéke nem üres, akkor az értékét hozzáadjuk az objektumhoz a mező ID-jával mint kulccsal.
-    urlapAdatokObjektum[selectElem.id] = selectElem.value;
- 
- 
-    if (valid) {
-        // Az összegyűjtött adatokat (az objektumot) elmentjük egy globális tömbbe, hogy később is elérhető legyen.
-        tomb.push(urlapAdatokObjektum);
- 
-        // Létrehozunk egy új táblázatsort (<tr>), amely majd a <tbody> részhez kerül.
-        const tablaTorzsSor = document.createElement('tr');
- 
-        // Hozzáadjuk a létrehozott sort a táblázat törzséhez (tbody).
-        tablaTest.appendChild(tablaTorzsSor);
- 
-        // Létrehozunk egy új <td> cellát a 'revolution' mező adatának (pl. 1848).
-        const forradalomCell = document.createElement('td');
- 
-        // Beállítjuk a cella szövegét a beküldött adat alapján.
-        forradalomCell.textContent = urlapAdatokObjektum.revolution;
- 
-        // Hozzáadjuk ezt a cellát a sorhoz.
-        tablaTorzsSor.appendChild(forradalomCell);
- 
-        // Létrehozunk egy új <td> cellát az 'year' mező adatának.
-        const evszamCell = document.createElement('td');
- 
-        // Beállítjuk a cella tartalmát a megfelelő évszám értékre.
-        evszamCell.textContent = urlapAdatokObjektum.year;
- 
-        // Hozzáadjuk az évszám cellát a táblázatsorhoz.
-        tablaTorzsSor.appendChild(evszamCell);
- 
-        // Létrehozunk egy új <td> cellát a 'successful' mező adatának (sikeres volt-e a forradalom).
-        const sikeresCell = document.createElement('td');
- 
-        // A sikeresség értékét "igen" vagy "nem" formában jelenítjük meg a cellában a 'yes'/'no' érték alapján.
-        sikeresCell.textContent = urlapAdatokObjektum.successful === 'yes' ? 'igen' : 'nem';
- 
-        // Hozzáadjuk a sikerességet tartalmazó cellát a sorhoz.
-        tablaTorzsSor.appendChild(sikeresCell);
-    }
-});
- 
-kont.appendChild(tabl);   // a táblázatos rész hozzáadása
-kont.appendChild(formD);  // az űrlapos rész hozzáadása
- 
- 
-// Létrehozunk egy fájl input mezőt
-const fajlInput = document.createElement('input'); // Új <input> elem létrehozása
-fajlInput.id = 'fajlinput'; // Beállítjuk az input mező ID-ját
-fajlInput.type = 'file'; // Az input mező típusát fájl feltöltésre állítjuk
- 
-// Hozzáadjuk a fájl input mezőt a fő konténer div-hez
-kont.appendChild(fajlInput);
-// Hozzáadunk egy eseményfigyelőt a fájl input mezőhöz, amely akkor aktiválódik, amikor a felhasználó fájlt választ
-fajlInput.addEventListener('change', (esemeny) => {
-    // Lekérjük a kiválasztott fájlt az esemény objektumából
-    const fajl = esemeny.target.files[0]; // Az `esemeny.target.files` egy fájlokat tartalmazó lista, az első fájlt választjuk ki
- 
-    // Létrehozunk egy FileReader példányt, amely lehetővé teszi a fájl tartalmának olvasását
-    const fajlOlvaso = new FileReader();
- 
-    // Amikor a fájl betöltődött, végrehajtjuk a következő műveleteket
-    fajlOlvaso.onload = () => {
-        // A fájl tartalmát sorokra bontjuk az `\n` (újsor) karakter alapján
-        const fajlSorok = fajlOlvaso.result.split('\n');
- 
-        // Az első sort (fejléc) eltávolítjuk, mert az nem tartalmaz adatokat
-        const fejlecNelkul = fajlSorok.slice(1);
- 
-        // Végigiterálunk a fájl sorain, hogy feldolgozzuk az adatokat
-        for (const sor of fejlecNelkul) {
-            // Levágjuk a felesleges szóközöket a sor elejéről és végéről
-            const vagottSor = sor.trim();
- 
-            // A sort mezőkre bontjuk pontosvessző (`;`) mentén
-            const mezok = vagottSor.split(';');
- 
-            // Létrehozunk egy objektumot az aktuális sor adataival
-            const revolution = {
-                revolution: mezok[0].trim(), // Az első mező a forradalom neve
-                year: mezok[1].trim(), // A második mező az évszám
-                successful: mezok[2].trim().toLowerCase() === 'igen' // A harmadik mező a sikeresség, logikai értékké alakítva
-            };
- 
-            // Hozzáadjuk az objektumot a globális tömbhöz, hogy később is elérhető legyen
-            tomb.push(revolution);
- 
-            // Létrehozunk egy új táblázatsort (<tr>), amely majd a táblázat törzséhez kerül
-            const tablaSor = document.createElement('tr');
-            tablaTest.appendChild(tablaSor); // Hozzáadjuk a sort a táblázat törzséhez
- 
-            // Létrehozunk egy cellát a forradalom nevéhez, és hozzáadjuk a táblázatsorhoz
-            const forradalomCella = document.createElement('td');
-            forradalomCella.textContent = revolution.revolution; // A cella szövegét a forradalom neve adja
-            tablaSor.appendChild(forradalomCella); // Hozzáadjuk a cellát a sorhoz
- 
-            // Létrehozunk egy cellát az évszámhoz, és hozzáadjuk a táblázatsorhoz
-            const evszamCella = document.createElement('td');
-            evszamCella.textContent = revolution.year; // A cella szövegét az évszám adja
-            tablaSor.appendChild(evszamCella); // Hozzáadjuk a cellát a sorhoz
- 
-            // Létrehozunk egy cellát a sikerességhez, és hozzáadjuk a táblázatsorhoz
-            const sikeresCella = document.createElement('td');
-            sikeresCella.textContent = revolution.successful ? 'igen' : 'nem'; // A cella szövege "igen" vagy "nem" lesz a sikeresség alapján
-            tablaSor.appendChild(sikeresCella); // Hozzáadjuk a cellát a sorhoz
-        }
-    };
- 
-    // Elindítjuk a fájl olvasását szövegként
-    fajlOlvaso.readAsText(fajl);
-});
- 
-// Létrehozunk egy új gombot, amely az adatok exportálására szolgál.
-const exportGomb = document.createElement('button'); // Új <button> elem létrehozása.
-exportGomb.textContent = 'Adatok letöltése'; // Beállítjuk a gomb szövegét, hogy a felhasználó számára egyértelmű legyen a funkciója.
-kont.appendChild(exportGomb); // Hozzáadjuk a gombot a fő konténer div-hez.
-// Hozzáadunk egy eseményfigyelőt a gombhoz, amely akkor aktiválódik, amikor a felhasználó rákattint.
- 
-exportGomb.addEventListener('click', () => {
-    // Létrehozunk egy <a> elemet, amely a fájl letöltéséhez szükséges.
-    const letoltesLink = document.createElement('a'); // Új <a> elem létrehozása.
- 
-    // Létrehozunk egy tömböt, amely a CSV fájl tartalmát fogja tárolni.
-    const tartalomTomb = ['forradalom;evszam;sikeres']; // Az első sor a fejléc, amely a mezők neveit tartalmazza.
- 
-    // Végigiterálunk a `tomb` tömbön, amely az exportálni kívánt adatokat tartalmazza.
-    for (const adat of tomb) {
-        // Minden objektum adatait pontosvesszővel elválasztva hozzáadjuk a tartalom tömbhöz.
-        tartalomTomb.push(`${adat.revolution};${adat.year};${adat.successful  === 'yes' ? 'igen' : 'nem'}`);
-    }
- 
-    // A tömb elemeit egyetlen szöveggé alakítjuk, ahol az elemeket új sor választja el.
-    const tartalom = tartalomTomb.join('\n'); // Az elemeket új sor (`\n`) karakterrel választjuk el.
- 
-    // Létrehozunk egy új Blob objektumot, amely a fájl tartalmát tárolja.
-    const fajl = new Blob([tartalom]); // A Blob az adatokat bináris formában tárolja.
- 
-    // Beállítjuk a letöltési linket a Blob objektumra.
-    letoltesLink.href = URL.createObjectURL(fajl); // A Blob objektumot URL-é alakítjuk, amely a fájl letöltésére használható.
-    letoltesLink.download = 'adatok.csv'; // Beállítjuk a letöltendő fájl nevét.
- 
-    // Automatikusan kattintást szimulálunk a letöltési linkre, hogy elindítsuk a letöltést.
-    letoltesLink.click(); // A linkre kattintás elindítja a fájl letöltését.
- 
-    // Felszabadítjuk az URL-t, hogy ne foglaljon feleslegesen memóriát.
-    URL.revokeObjectURL(letoltesLink.href); // Az URL-t érvénytelenítjük, miután már nincs rá szükség.
-})
- 
- 
-// Létrehozunk egy új div elemet, amely az új szűrő űrlapot tartalmazza.
-const filterFormDiv = letrehozDiv('filterForm'); // A 'filterForm' osztályt használjuk a stílushoz.
-kont.appendChild(filterFormDiv); // Hozzáadjuk az új divet a fő konténerhez.
- 
-// Létrehozunk egy <form> elemet, amely az új szűrő űrlapot tartalmazza.
-const formForFilter = document.createElement('form'); // Új <form> elem létrehozása.
-filterFormDiv.appendChild(formForFilter); // Hozzáadjuk az űrlapot az új divhez.
- 
-// Létrehozunk egy <select> elemet, amely lehetővé teszi a szűrési mező kiválasztását.
-const select = document.createElement('select'); // Új <select> elem létrehozása.
-formForFilter.appendChild(select); // Hozzáadjuk a legördülő menüt az űrlaphoz.
- 
-// Definiáljuk a legördülő menü opcióit.
-const options = [
-    { value: '', innerText: 'üres' }, // Üres opció (alapértelmezett).
-    { value: 'revolution', innerText: 'forradalom' }, // Szűrés forradalom neve alapján.
-    { value: 'year', innerText: 'évszám' }, // Szűrés évszám alapján.
-    { value: 'successful', innerText: 'sikeres' } // Szűrés sikeresség alapján.
-];
- 
-// Végigiterálunk az opciók listáján, és hozzáadjuk őket a legördülő menühöz.
-for (const option of options) {
-    const optionElement = document.createElement('option'); // Új <option> elem létrehozása.
-    optionElement.value = option.value; // Beállítjuk az opció értékét.
-    optionElement.innerText = option.innerText; // Beállítjuk az opció szövegét.
-    select.appendChild(optionElement); // Hozzáadjuk az opciót a legördülő menühöz.
-}
- 
-// Létrehozunk egy <input> mezőt, amelybe a felhasználó beírhatja a szűrési értéket.
-const input = document.createElement('input'); // Új <input> elem létrehozása.
-input.id = 'filterInput'; // Beállítjuk az input mező ID-ját.
-formForFilter.appendChild(input); // Hozzáadjuk az input mezőt az űrlaphoz.
- 
-// Létrehozunk egy <button> elemet, amely a szűrés indítására szolgál.
-const button = document.createElement('button'); // Új <button> elem létrehozása.
-button.innerText = 'Szűrés'; // Beállítjuk a gomb szövegét.
-formForFilter.appendChild(button); // Hozzáadjuk a gombot az űrlaphoz.
- 
-// Hozzáadunk egy eseményfigyelőt az űrlaphoz, amely akkor aktiválódik, amikor a felhasználó beküldi az űrlapot.
-// Hozzáadunk egy eseményfigyelőt az űrlaphoz, amely akkor aktiválódik, amikor a felhasználó beküldi az űrlapot.
+// Definiáljuk az Adat típusát, amely tartalmazza a forradalom, évszám és sikeresség adatokat
+/** 
+ * @typedef {Object} Adat // Az adatok típusdefiníciója
+ * @property {string} revolution - A forradalom neve
+ * @property {string} year - Az évszám karakterláncként
+ * @property {boolean} successful - A forradalom sikerességének logikai értéke
+ */
 
-const eredmenyDiv = document.createElement('div'); // Létrehoz egy div elemet a szűrés eredményének megjelenítésére
-eredmenyDiv.className = 'result'; // Létrehoz egy div elemet a szűrés eredményének megjelenítésére
-kont.appendChild(eredmenyDiv); // Hozzáadja a fő konténerhez a szűrés eredményét megjelenítő divet
-formForFilter.addEventListener('submit', (e) => {
-    // Megakadályozzuk az űrlap alapértelmezett viselkedését, hogy ne töltse újra az oldalt.
-    e.preventDefault();
- 
-    // Lekérjük az űrlapban található input mezőt, amelybe a felhasználó beírja a szűrési értéket.
-    const filterInput = e.target.querySelector('#filterInput');
- 
-    // Lekérjük az űrlapban található legördülő menü aktuálisan kiválasztott értékét.
-    const selectedOption = e.target.querySelector('select').value;
- 
-    // A `tomb` tömböt szűrjük a megadott mező (legördülő menü) és érték (input mező) alapján.
-    const filteredArray = tomb.filter((element) => {
-        // Ha a legördülő menüben a "forradalom" opció van kiválasztva:
-        if (selectedOption === 'revolution') {
-            // Ellenőrizzük, hogy a `revolution` mező tartalmazza-e az input mező értékét (kis- és nagybetű érzékenység nélkül).
-            return element.revolution.toLowerCase().includes(filterInput.value.toLowerCase());
+// Definiáljuk a callback típusát, amelyet a táblázat törzsének kezelésére használunk
+/** 
+ * @callback TablaCallback
+ * @param {HTMLTableSectionElement} tablaTest - A táblázat törzsét reprezentáló HTML elem
+ * @returns {void}
+ */
+
+// Inicializálunk egy üres tömböt az Adat típusú objektumok tárolására
+/** @type {Array<Adat>} */ const tomb = []; // Üres tömb létrehozása Adat típusú elemek számára
+
+/**
+ * Létrehoz egy div elemet a megadott osztálynévvel.
+ * @param {string} osztaly - A div osztályneve.
+ * @returns {HTMLDivElement} - A létrehozott div elem.
+ */
+const letrehozDiv = (osztaly) => { // Függvény: div létrehozása adott osztállyal
+    const div = document.createElement('div'); // Létrehoz egy új div elemet a dokumentumból
+    div.className = osztaly; // Beállítja a div osztálynevét a paraméterként kapott értékre
+    return div; // Visszaadja a létrehozott div elemet
+};
+
+/**
+ * Táblázat létrehozása és inicializálása.
+ * @param {HTMLElement} kont - A táblázatot tartalmazó konténer.
+ * @param {TablaCallback} callback - A táblázat törzsének kezelésére szolgáló callback függvény.
+ */
+const letrehozTabla = (kont, callback) => { // Függvény: táblázat létrehozása a megadott konténerben, majd callback meghívása a táblázat törzsére
+    const tabl = letrehozDiv('table'); // Létrehoz egy div-et a 'table' osztállyal a táblázat környezetének
+    kont.appendChild(tabl); // Hozzáfűzi az előbb létrehozott div-et a konténerhez
+
+    const tablaElem = document.createElement('table'); // Létrehoz egy <table> elemet a dokumentumból
+    tabl.appendChild(tablaElem); // Az elkészített table elemet hozzáadja a div-hez
+
+    const fejlec = document.createElement('thead'); // Létrehoz egy <thead> elemet a táblázat fejlécéhez
+    tablaElem.appendChild(fejlec); // Hozzáadja a fejléct a table elemhez
+
+    const fejlecSor = document.createElement('tr'); // Létrehoz egy sort (<tr>) a fejléc számára
+    fejlec.appendChild(fejlecSor); // A sort hozzáfűzi a thead elemhez
+
+    const fejlecMezok = ['forradalom', 'évszám', 'sikeres']; // Definiálja a fejléc cellák szövegét tartalmazó tömböt
+    for (const szoveg of fejlecMezok) { // Végigiterál a fejléc mezőkön
+        const cella = document.createElement('th'); // Létrehoz egy fejléccella elemet (<th>)
+        cella.innerText = szoveg; // Beállítja a cella szövegét az aktuális értékre
+        fejlecSor.appendChild(cella); // Hozzáfűzi a fejléccellát a fejléc sorához
+    }
+
+    const tablaTest = document.createElement('tbody'); // Létrehoz egy <tbody> elemet a táblázat törzséhez
+    tablaElem.appendChild(tablaTest); // Hozzáadja a tbody-t a table elemhez
+
+    callback(tablaTest); // Meghívja a callback függvényt, átadva neki a táblázat törzsét
+};
+
+/**
+ * Új sor hozzáadása a táblázathoz.
+ * @param {Adat} adat - Az adat objektum, mely tartalmazza a forradalom, évszám és sikeres értékeket.
+ * @param {HTMLTableSectionElement} tablaTest - A táblázat törzsét reprezentáló HTML elem.
+ */
+const hozzaadSor = (adat, tablaTest) => { // Függvény: új sor beszúrása a táblázat törzsébe az adott adatokkal
+    const tablaSor = document.createElement('tr'); // Létrehoz egy új sort (<tr>) a táblázat számára
+    tablaTest.appendChild(tablaSor); // Hozzáfűzi az új sort a táblázat törzséhez
+
+    const forradalomCell = document.createElement('td'); // Létrehoz egy cellát (<td>) a forradalom adat megjelenítéséhez
+    forradalomCell.textContent = adat.revolution; // Beállítja a cella tartalmát az adat "revolution" értékére
+    tablaSor.appendChild(forradalomCell); // A cellát hozzáadja az aktuális sorhoz
+
+    const evszamCell = document.createElement('td'); // Létrehoz egy cellát (<td>) az évszám adat megjelenítéséhez
+    evszamCell.textContent = adat.year; // Beállítja a cella tartalmát az adat "year" értékére
+    tablaSor.appendChild(evszamCell); // Hozzáfűzi a cellát az aktuális sorhoz
+
+    const sikeresCell = document.createElement('td'); // Létrehoz egy cellát (<td>) a sikeresség adat megjelenítéséhez
+    sikeresCell.textContent = adat.successful ? 'igen' : 'nem'; // Kiértékeli: ha az adat sikeres, "igen", egyébként "nem"
+    tablaSor.appendChild(sikeresCell); // Hozzáadja a cellát az aktuális sorhoz
+};
+
+/**
+ * Űrlap létrehozása és kezelése.
+ * @param {HTMLElement} kont - A konténer, amely az űrlapot tartalmazza.
+ * @param {HTMLTableSectionElement} tablaTest - A táblázat törzsét reprezentáló HTML elem, ahová az adatok kerülnek.
+ */
+const letrehozUrlap = (kont, tablaTest) => { // Függvény: űrlap létrehozása és kezelése a megadott konténerben
+    const formD = letrehozDiv('form'); // Létrehoz egy div-et 'form' osztállyal az űrlap környezetéhez
+    kont.appendChild(formD); // Hozzáadja az űrlap div-et a konténerhez
+
+    const urlap = document.createElement('form'); // Létrehoz egy <form> elemet a dokumentumból
+    formD.appendChild(urlap); // Hozzáadja a form elemet a létrehozott div-hez
+
+    // Mezőadatok tömb létrehozása, mely meghatározza az űrlap mezőinek azonosítóját és címkéjét
+    const mezoAdatLista = [ // Definiál egy tömböt az űrlap mezőinek adataival
+        { fieldid: 'revolution', fieldLabel: 'forradalom' }, // Első mező: forradalom
+        { fieldid: 'year', fieldLabel: 'évszám' }, // Második mező: évszám
+        { fieldid: 'successful', fieldLabel: 'sikeres' } // Harmadik mező: sikeres
+    ];
+
+    for (const mezo of mezoAdatLista) { // Végigiterál a definiált mezőadatokon
+        const mezoDiv = letrehozDiv('field'); // Létrehoz egy div-et 'field' osztállyal az aktuális mező számára
+        urlap.appendChild(mezoDiv); // Hozzáadja a mező div-et a form elemhez
+
+        const cimke = document.createElement('label'); // Létrehoz egy <label> elemet a mező címkéjeként
+        cimke.htmlFor = mezo.fieldid; // Beállítja a label kapcsolódását az input azonosítójához
+        cimke.textContent = mezo.fieldLabel; // Beállítja a label szövegét a mező címkéjére
+        mezoDiv.appendChild(cimke); // Hozzáadja a label elemet a mező div-hez
+        mezoDiv.appendChild(document.createElement('br')); // Hozzáad egy sortörést a címke után
+
+        if (mezo.fieldid === 'successful') { // Ellenőrzi, hogy a mező "successful" típusú-e
+            const legordulo = document.createElement('select'); // Létrehoz egy <select> elemet legördülő lista számára
+            legordulo.id = mezo.fieldid; // Beállítja a select azonosítóját a mező fieldid értékére
+
+            const opcioIgen = document.createElement('option'); // Létrehoz egy <option> elemet a "igen" választáshoz
+            opcioIgen.value = 'yes'; // Beállítja az opció értékét "yes"-re
+            opcioIgen.textContent = 'igen'; // Beállítja az opció szövegét "igen"-re
+            legordulo.appendChild(opcioIgen); // Hozzáadja az opciót a select elemhez
+
+            const opcioNem = document.createElement('option'); // Létrehoz egy <option> elemet a "nem" választáshoz
+            opcioNem.value = 'no'; // Beállítja az opció értékét "no"-ra
+            opcioNem.textContent = 'nem'; // Beállítja az opció szövegét "nem"-re
+            legordulo.appendChild(opcioNem); // Hozzáadja az opciót a select elemhez
+
+            mezoDiv.appendChild(legordulo); // Hozzáadja a select elemet a mező div-hez
+        } else { // Ha a mező nem "successful" típusú
+            const inputElem = document.createElement('input'); // Létrehoz egy <input> elemet a szövegbevitelhez
+            inputElem.id = mezo.fieldid; // Beállítja az input azonosítóját a mező fieldid értékére
+            mezoDiv.appendChild(inputElem); // Hozzáadja az input elemet a mező div-hez
         }
-        // Ha a legördülő menüben az "évszám" opció van kiválasztva:
-        else if (selectedOption === 'year') {
-            // Ellenőrizzük, hogy az `year` mező számmá alakítva megegyezik-e az input mező értékével (szintén számmá alakítva).
-            return Number(element.year) === Number(filterInput.value);
+
+        const errorElem = document.createElement('span'); // Létrehoz egy <span> elemet a hibaüzenetek megjelenítéséhez
+        errorElem.className = 'error'; // Beállítja a span osztályát "error"-re
+        mezoDiv.appendChild(errorElem); // Hozzáadja a hibaüzenet span-t a mező div-hez
+    }
+
+    const gomb = document.createElement('button'); // Létrehoz egy <button> elemet az űrlap adatainak beküldéséhez
+    gomb.textContent = 'hozzáadás'; // Beállítja a gomb szövegét "hozzáadás"-ra
+    urlap.appendChild(gomb); // Hozzáadja a gombot a form elemhez
+
+    urlap.addEventListener('submit', (e) => { // Feliratkozik a form "submit" eseményére
+        e.preventDefault(); // Megakadályozza az űrlap alapértelmezett beküldését
+        const urlapAdatokObjektum = {}; // Inicializál egy üres objektumot az űrlap adatainak tárolására
+        let valid = true; // Beállítja a validálás eredményét alapértelmezetten igazra
+
+        const inputMezok = e.target.querySelectorAll('input, select'); // Lekéri az összes input és select elemet az űrlapon
+        for (const inputMezo of inputMezok) { // Végigiterál az összes megtalált űrlapmezőn
+            const error = inputMezo.parentElement.querySelector('.error'); // Lekéri a mezőhöz tartozó error span-t
+            error.textContent = ''; // Törli az esetleges korábbi hibaüzenetet
+
+            if (inputMezo.value === '') { // Ellenőrzi, hogy az aktuális mező értéke üres-e
+                error.textContent = 'Kötelező megadni'; // Beállítja a hibaüzenetet, ha az érték üres
+                valid = false; // Az űrlap érvénytelenné válik
+            }
+            // Az értéket átadja az űrlapAdatokObjektum-nek az input azonosítója alapján; ha "yes", akkor true, ha "no", akkor false, máskülönben az eredeti értéket
+            urlapAdatokObjektum[inputMezo.id] = inputMezo.value === 'yes' ? true : inputMezo.value === 'no' ? false : inputMezo.value;
         }
-        // Ha a legördülő menüben a "sikeres" opció van kiválasztva:
-        else if (selectedOption === 'successful') {
-            // Ellenőrizzük, hogy a `successful` mező logikai értéke megegyezik-e az input mező értékével ("igen" vagy "nem").
-            return element.successful === (filterInput.value.toLowerCase() === 'igen');
-        }
-        // Ha nincs kiválasztva semmilyen mező a legördülő menüből:
-        else {
-            // Minden elem megjelenik, mert nincs szűrési feltétel.
-            return true;
+
+        if (valid) { // Ha az űrlap minden mezője megfelelően kitöltött
+            tomb.push(urlapAdatokObjektum); // Hozzáfűzi az új adat objektumot a globális tömbhöz
+            hozzaadSor(urlapAdatokObjektum, tablaTest); // Hozzáad egy új sort a táblázathoz az adott adatokkal
+            urlap.reset(); // Visszaállítja az űrlapot az alapértelmezett állapotba
         }
     });
- 
- 
-    // Töröljük a táblázat törzsét, hogy csak a szűrt elemek jelenjenek meg.
-    tablaTest.innerHTML = '';
- 
-    // Végigiterálunk a szűrt elemek listáján, és hozzáadjuk őket a táblázathoz.
-    for (const filteredElement of filteredArray) {
-        const tableBodyRow = document.createElement('tr'); // Új <tr> elem létrehozása.
-        tablaTest.appendChild(tableBodyRow); // Hozzáadjuk a sort a táblázat törzséhez.
- 
-        // Létrehozunk egy cellát a forradalom nevéhez, és hozzáadjuk a táblázatsorhoz.
-        const nameCell = document.createElement('td');
-        nameCell.textContent = filteredElement.revolution; // A cella szövegét a forradalom neve adja.
-        tableBodyRow.appendChild(nameCell);
- 
-        // Létrehozunk egy cellát az évszámhoz, és hozzáadjuk a táblázatsorhoz.
-        const yearCell = document.createElement('td');
-        yearCell.textContent = filteredElement.year; // A cella szövegét az évszám adja.
-        tableBodyRow.appendChild(yearCell);
- 
-        // Létrehozunk egy cellát a sikerességhez, és hozzáadjuk a táblázatsorhoz.
-        const successCell = document.createElement('td');
-        successCell.textContent = filteredElement.successful ? 'igen' : 'nem'; // A cella szövege "igen" vagy "nem" lesz.
-        tableBodyRow.appendChild(successCell);
+};
+
+/**
+ * Fájl feltöltésének kezelését valósítja meg.
+ * @param {HTMLElement} kont - A konténer, amely tartalmazza a fájl feltöltő elemet.
+ * @param {HTMLTableSectionElement} tablaTest - A táblázat törzsét reprezentáló HTML elem, ahová az adatok kerülnek.
+ */
+const letrehozFajlFeltoltes = (kont, tablaTest) => { // Függvény: fájl feltöltésének kezelése a megadott konténerben
+    const fajlInput = document.createElement('input'); // Létrehoz egy <input> elemet a fájlfeltöltéshez
+    fajlInput.type = 'file'; // Beállítja az input típusát "file"-ra
+    kont.appendChild(fajlInput); // Hozzáadja a fájl input elemet a konténerhez
+
+    fajlInput.addEventListener('change', (e) => { // Feliratkozik a fájl input "change" eseményére
+        const fajl = e.target.files[0]; // Lekéri az első kiválasztott fájlt az inputból
+        const fajlOlvaso = new FileReader(); // Létrehoz egy FileReader objektumot a fájl tartalmának beolvasására
+
+        fajlOlvaso.onload = () => { // Beállítja a FileReader "onload" eseményét, amely a fájl sikeres beolvasása után fut le
+            const sorok = fajlOlvaso.result.split('\n').slice(1); // Felosztja a beolvasott fájl tartalmát sorokra és kihagyja az első sort (fejléc)
+            for (const sor of sorok) { // Végigiterál a fájl minden többi során
+                const mezok = sor.trim().split(';'); // Levágja a fölösleges szóközöket, majd elválasztja az elemeket ";" alapján
+                const adat = { // Létrehoz egy adat objektumot az aktuális sor alapján
+                    revolution: mezok[0], // Az első elem értéke a "revolution" tulajdonság
+                    year: mezok[1],       // A második elem értéke a "year" tulajdonság
+                    successful: mezok[2] === 'igen' // A harmadik elem alapján boolean értéket állít be (igaz, ha "igen")
+                };
+                tomb.push(adat); // Hozzáfűzi az új adatot a globális tömbhöz
+                hozzaadSor(adat, tablaTest); // Hozzáad egy sort a táblázathoz az aktuális adatokkal
+            }
+        };
+
+        fajlOlvaso.readAsText(fajl); // Elindítja a fájl beolvasását szövegként
+    });
+};
+
+/**
+ * Adatok exportálása CSV fájlba.
+ * @param {HTMLElement} kont - A konténer, amely tartalmazza az export gombot.
+ */
+const letrehozFajlLetoltes = (kont) => { // Függvény: adatok CSV fájlba történő exportálásához szükséges gomb létrehozása
+    const exportGomb = document.createElement('button'); // Létrehoz egy <button> elemet az exportáláshoz
+    exportGomb.textContent = 'Adatok letöltése'; // Beállítja a gomb szövegét "Adatok letöltése"-re
+    kont.appendChild(exportGomb); // Hozzáadja a gombot a konténerhez
+
+    exportGomb.addEventListener('click', () => { // Feliratkozik a gomb "click" eseményére
+        // Összeállítja a CSV tartalmat: első sor a fejléc, majd a tömb elemeinek string formátumba rendezett sorai
+        const tartalom = ['forradalom;evszam;sikeres', ...tomb.map(adat => `${adat.revolution};${adat.year};${adat.successful ? 'igen' : 'nem'}`)].join('\n');
+        const fajl = new Blob([tartalom]); // Létrehoz egy Blob objektumot a CSV tartalommal
+        const letoltesLink = document.createElement('a'); // Létrehoz egy <a> elemet a letöltési link számára
+        letoltesLink.href = URL.createObjectURL(fajl); // Beállítja a link href-jét a Blob URL-jére
+        letoltesLink.download = 'adatok.csv'; // Beállítja a letöltendő fájl nevét
+        letoltesLink.click(); // Programozottan rákattint a linkre a letöltés elindításához
+        URL.revokeObjectURL(letoltesLink.href); // Felszabadítja a Blob URL által foglalt erőforrásokat
+    });
+};
+
+/**
+ * Szűrő űrlap létrehozása és kezelése.
+ * @param {HTMLElement} kont - A konténer, amely tartalmazza a szűrő űrlapot.
+ * @param {HTMLTableSectionElement} tablaTest - A táblázat törzsét reprezentáló HTML elem, amelyet szűrni akarunk.
+ */
+const letrehozSzuroUrlap = (kont, tablaTest) => { // Függvény: szűrő űrlap létrehozása, amely lehetővé teszi a táblázat adatok szűrését
+    const filterFormDiv = letrehozDiv('filterForm'); // Létrehoz egy div-et 'filterForm' osztállyal a szűrő űrlap számára
+    kont.appendChild(filterFormDiv); // Hozzáadja a filterForm div-et a konténerhez
+
+    const formForFilter = document.createElement('form'); // Létrehoz egy <form> elemet a szűrési művelethez
+    filterFormDiv.appendChild(formForFilter); // Hozzáadja a form elemet a filterForm div-hez
+
+    const select = document.createElement('select'); // Létrehoz egy <select> elemet a szűrő opciók számára
+    formForFilter.appendChild(select); // Hozzáadja a select elemet a form elemhez
+
+    const options = [ // Definiál egy tömböt az összes szűrő opció adataival
+        { value: '', innerText: 'üres' }, // Első opció: nincs kiválasztva semmi
+        { value: 'revolution', innerText: 'forradalom' }, // Második opció: forradalom
+        { value: 'year', innerText: 'évszám' }, // Harmadik opció: évszám
+        { value: 'successful', innerText: 'sikeres' } // Negyedik opció: sikeres
+    ];
+
+    for (const option of options) { // Végigiterál az opciókat tartalmazó tömbön
+        const optionElement = document.createElement('option'); // Létrehoz egy <option> elemet
+        optionElement.value = option.value; // Beállítja az option értékét az aktuális opció alapján
+        optionElement.innerText = option.innerText; // Beállítja az opció megjelenített szövegét
+        select.appendChild(optionElement); // Hozzáadja az option elemet a select elemhez
     }
- 
-    eredmenyDiv.textContent = `A feltételnek megfelelő elemek száma: ${filteredArray.length}`;});//Ez a sor beállítja az eredmenyDiv HTML elem szöveges tartalmát (textContent) úgy, hogy megjelenítse a szűrési feltételeknek megfelelő elemek számát. A filteredArray.length a szűrt elemek számát adja vissza, és ezt illeszti be a szövegbe.
- 
+
+    const input = document.createElement('input'); // Létrehoz egy <input> elemet a szűrő szöveg beviteléhez
+    input.id = 'filterInput'; // Beállítja az input azonosítóját "filterInput"-ra
+    formForFilter.appendChild(input); // Hozzáadja az input elemet a form elemhez
+
+    const button = document.createElement('button'); // Létrehoz egy <button> elemet a szűrés beküldéséhez
+    button.textContent = 'Szűrés'; // Beállítja a gomb szövegét "Szűrés"-re
+    formForFilter.appendChild(button); // Hozzáadja a gombot a form elemhez
+
+    const resultDiv = document.createElement('div'); // Létrehoz egy <div> elemet az eredmény megjelenítésére
+    resultDiv.className = 'result'; // Beállítja a div osztályát "result"-re
+    kont.appendChild(resultDiv); // Hozzáadja a result div-et a konténerhez
+
+    formForFilter.addEventListener('submit', (e) => { // Feliratkozik a form "submit" eseményére a szűrés végrehajtásához
+        e.preventDefault(); // Megakadályozza az űrlap alapértelmezett beküldését
+        const filterInput = input.value.toLowerCase(); // Lekéri az input értékét és kisbetűssé alakítja azt
+        const selectedOption = select.value; // Lekéri a select elemben kiválasztott opció értékét
+
+        // Szűri a globális tömböt úgy, hogy az adott adat megfelel-e a megadott feltételnek
+        const filteredArray = tomb.filter(adat => {
+            if (!selectedOption) return true; // Ha nincs kiválasztva opció, minden adatot elfogad
+            const value = adat[selectedOption]; // Lekéri az aktuális adat adott tulajdonságát a select elem alapján
+            return typeof value === 'string' 
+                ? value.toLowerCase().includes(filterInput) // Ha a value string, kisbetűsítve ellenőrzi, hogy tartalmazza-e a filterInput-ot
+                : value === (filterInput === 'igen'); // Ha nem string, boolean összehasonlítást végez (igaz, ha a filterInput "igen")
+        });
+
+        tablaTest.innerHTML = ''; // Törli a táblázat törzsének eddigi tartalmát
+        for (const adat of filteredArray) { // Végigiterál a szűrt adat tömbön
+            hozzaadSor(adat, tablaTest); // Hozzáad egy új sort a táblázathoz a szűrt adatok alapján
+        }
+
+        resultDiv.textContent = `A feltételnek megfelelő elemek száma: ${filteredArray.length}`; // Frissíti az eredmény div szövegét a szűrt elemek számával
+    });
+};
+
+// Fő konténer létrehozása és inicializálása
+const kont = letrehozDiv('container-sima'); // Létrehoz egy div-et "container-sima" osztállyal a fő tartalom számára
+document.body.appendChild(kont); // Hozzáadja a fő konténert a dokumentum <body> eleméhez
+
+// Táblázat létrehozása és inicializálása, majd a callback-ben hívja meg a további funkciókat
+letrehozTabla(kont, (tablaTest) => { // Meghívja a letrehozTabla függvényt a fő konténerrel és egy callback függvénnyel, mely a táblázat törzsét adja meg
+    letrehozUrlap(kont, tablaTest); // Létrehozza az adatbeviteli űrlapot
+    letrehozFajlFeltoltes(kont, tablaTest); // Létrehozza a fájl feltöltés funkciót az adatok betöltéséhez
+    letrehozFajlLetoltes(kont); // Létrehozza az adatok exportálását megvalósító gombot
+    letrehozSzuroUrlap(kont, tablaTest); // Létrehozza a szűrő űrlapot az adatok szűréséhez
+});
